@@ -1,9 +1,13 @@
-node_modules
-.env
-coverage
-coverage.json
-typechain
+# Dependencies
+node_modules/
 
-#Hardhat files
-cache
-artifacts
+# Hardhat
+artifacts/
+cache/
+
+# Local enviroment
+.env
+
+# Misc
+.DS_Store
+*.pem
