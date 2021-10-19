@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
 
@@ -22,6 +22,7 @@ contract WavePortal {
     console.log("This isn't just a contract, it's smart too :D");
   }
 
+  // Send a message (wave) using the contract
   function wave(string memory _message) public {
     require(
       lastWavedAt[msg.sender] + 5 minutes < block.timestamp,
@@ -34,11 +35,12 @@ contract WavePortal {
 
     waves.push(Wave(msg.sender, _message, block.timestamp));
 
+    // Randomly award a sender with .0001 rEth, with 10% odds
     uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
     console.log("Random # generated: %s", randomNumber);
     seed = randomNumber;
 
-    if (randomNumber < 50) {
+    if (randomNumber < 10) {
       console.log("%s won!", msg.sender);
 
       uint256 prizeAmount = 0.0001 ether;
@@ -46,13 +48,16 @@ contract WavePortal {
         prizeAmount <= address(this).balance,
         "Trying to withdraw more money than the contract has."
       );
+
       (bool success, ) = (msg.sender).call{value: prizeAmount}("");
       require(success, "Failed to withdraw money from contract.");
     }
 
+    // Send notification for every new wave
     emit NewWave(msg.sender, block.timestamp, _message);
   }
 
+  // Return metadata from all previous waves
   function getAllWaves() public view returns (Wave[] memory) {
     return waves;
   }

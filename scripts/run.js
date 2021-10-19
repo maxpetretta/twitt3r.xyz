@@ -1,13 +1,15 @@
-// Retrieve and run smart contract once
+// Run the smart contract locally
 const main = async () => {
-  const [owner, randomPerson] = await hre.ethers.getSigners();
+  const [owner] = await hre.ethers.getSigners();
+
+  // Deploy the contract
   const waveContractFactory = await hre.ethers.getContractFactory('WavePortal');
   const waveContract = await waveContractFactory.deploy({
-    value: hre.ethers.utils.parseEther('0.1'),
+    value: hre.ethers.utils.parseEther('0.1'), // Initial contract balance, for paying out awards
   });
   await waveContract.deployed();
 
-  console.log("Contract deployed to:", waveContract.address);
+  console.log("\nContract deployed to:", waveContract.address);
   console.log("Contract deployed by:", owner.address, "\n");
 
   let contractBalance = await hre.ethers.provider.getBalance(
@@ -21,13 +23,8 @@ const main = async () => {
   let waveCount;
   waveCount = await waveContract.getTotalWaves();
 
-  let waveTxn = await waveContract.wave('This is wave #1');
-  await waveTxn.wait();
-
-  waveTxn = await waveContract.wave('This is wave #2');
-  await waveTxn.wait();
-
-  waveTxn = await waveContract.wave('This is wave #3');
+  // Send a test wave on the local blockchain
+  let waveTxn = await waveContract.wave('This is a test wave');
   await waveTxn.wait();
 
   waveCount = await waveContract.getTotalWaves();
@@ -39,7 +36,8 @@ const main = async () => {
     'Contract balance:',
     hre.ethers.utils.formatEther(contractBalance)
   );
-
+  
+  // Retrieve metadata for all senders
   let allWaves = await waveContract.getAllWaves();
   console.log(allWaves);
 }; 
