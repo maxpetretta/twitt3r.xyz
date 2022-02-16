@@ -1,69 +1,131 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-pragma solidity ^0.8.4;
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol"; // DEBUG
 
-import "hardhat/console.sol";
-
-contract WavePortal {
-  uint256 totalWaves;
+contract WavePortal is Ownable {
+  bool public paused = true;
+  uint256 public price = 0.0001 ether;
+  uint256 public jackpot = 0.001 ether;
+  uint256 public odds = 10;
+  address public lastWinner;
   uint256 private seed;
-
-  event NewWave(address indexed from, uint256 timestamp, string message);
+  
   struct Wave {
-    address waver;
-    string message;
+    address sender;
     uint256 timestamp;
+    string message;
   }
 
-  Wave[] waves;
+  Wave[] public waves;
   mapping(address => uint256) public lastWavedAt;
+  event NewWave(address indexed from, uint256 timestamp, string message);
 
   constructor() payable {
-    console.log("This isn't just a contract, it's smart too :D");
+    wave("Hello World!");
   }
+
+
+  // Manage the contract's balance
+  function deposit() public payable {}
+
+  function withdraw() public onlyOwner {
+    uint256 amount = address(this).balance;
+    (bool sent, ) = owner().call{value: amount}("");
+    require(sent, "Failed to withdraw from contract");
+  }
+
+  function setPrice(uint256 newPrice) public onlyOwner {
+    price = newPrice;
+  }
+
+  function setJackpot(uint256 newJackpot) public onlyOwner {
+    jackpot = newJackpot;
+  }
+
+  function setOdds(uint256 newOdds) public onlyOwner {
+    odds = newOdds;
+  }
+
+
+  // Manage the contract's state
+  function clear() public onlyOwner {
+    delete waves;
+  }
+
+  function isPaused(bool value) public onlyOwner {
+    paused = value;
+  }
+
 
   // Send a message (wave) using the contract
-  function wave(string memory _message) public {
-    require(
-      lastWavedAt[msg.sender] + 5 minutes < block.timestamp,
-      "Please wait 5 minutes before waving again!"
-    );
+  function wave(string memory message) public payable {
+    require(!paused, "The wave portal has been paused!");
+    require(msg.value >= price, "Amount sent is incorrect");
+    require(lastWavedAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before waving again!");
     lastWavedAt[msg.sender] = block.timestamp;
 
-    totalWaves += 1;
-    console.log("%s has waved!", msg.sender);
+    console.log("%s has waved!", msg.sender); // DEBUG
+    waves.push(Wave(msg.sender, block.timestamp, message));
 
-    waves.push(Wave(msg.sender, _message, block.timestamp));
+    // Check if the sender has won the jackpot
+    checkLottery(payable(msg.sender));
 
-    // Randomly award a sender with .0001 rEth, with 10% odds
-    uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
-    console.log("Random # generated: %s", randomNumber);
-    seed = randomNumber;
-
-    if (randomNumber < 10) {
-      console.log("%s won!", msg.sender);
-
-      uint256 prizeAmount = 0.0001 ether;
-      require(
-        prizeAmount <= address(this).balance,
-        "Trying to withdraw more money than the contract has."
-      );
-
-      (bool success, ) = (msg.sender).call{value: prizeAmount}("");
-      require(success, "Failed to withdraw money from contract.");
-    }
-
-    // Send notification for every new wave
-    emit NewWave(msg.sender, block.timestamp, _message);
+    // Alert subscribers to the new wave transaction
+    emit NewWave(msg.sender, block.timestamp, message);
   }
 
-  // Return metadata from all previous waves
+  // Randomly award a sender with the jackpot, at the set odds
+  function checkLottery(address payable sender) private {
+    require(address(this).balance >= jackpot, "Contract balance is insufficient");
+    uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
+    console.log("Random # generated: %s", randomNumber); // DEBUG
+    seed = randomNumber;
+
+    if (randomNumber < odds) {
+      console.log("%s has won!", msg.sender); // DEBUG
+
+      (bool sent, ) = sender.call{value: jackpot}("");
+      require(sent, "Failed to withdraw from contract");
+    }
+  }
+
+  // Delete a wave from the contract
+  function deleteWave(uint256 index, address sender) public {
+    require(waves.length > index, "Given index is invalid");
+    require(waves[index].sender == sender, "Sender does not match the given wave");
+    waves[index] = waves[waves.length - 1];
+    waves.pop();
+  }
+
+
+  // Retrieve contract metadata
+  function getBalance() public view returns (uint256) {
+    return address(this).balance;
+  }
+
+  function isPaused() public view returns (bool) {
+    return paused;
+  }
+
+  function getPrice() public view returns (uint256) {
+    return price;
+  }
+
+  function getJackpot() public view returns (uint256) {
+    return jackpot;
+  }
+  
+  function getLastWinner() public view returns (address) {
+    return lastWinner;
+  }
+
   function getAllWaves() public view returns (Wave[] memory) {
     return waves;
   }
 
   function getTotalWaves() public view returns (uint256) {
-    console.log("We have %d total waves!", totalWaves);
-    return totalWaves;
+    return waves.length;
   }
 }
