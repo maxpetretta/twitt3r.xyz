@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol"; // DEBUG
 
 contract WavePortal is Ownable {
-  bool public paused = true;
+  bool public paused = false;
   uint256 public price = 0.0001 ether;
   uint256 public jackpot = 0.001 ether;
   uint256 public odds = 10;
