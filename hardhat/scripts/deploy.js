@@ -8,7 +8,7 @@ const main = async () => {
 
   const token = await hre.ethers.getContractFactory('WavePortal');
   const portal = await token.deploy({
-    value: hre.ethers.utils.parseEther('0.001'), // Initial contract balance, for paying out awards
+    value: hre.ethers.utils.parseEther('1.0'), // Initial contract balance, for paying out awards
   });
 
   await portal.deployed();

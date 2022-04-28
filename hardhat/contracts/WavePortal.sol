@@ -13,6 +13,7 @@ contract WavePortal is Ownable {
   uint256 private seed;
   
   struct Wave {
+    uint256 index;
     address sender;
     uint256 timestamp;
     string message;
@@ -20,10 +21,10 @@ contract WavePortal is Ownable {
 
   Wave[] public waves;
   mapping(address => uint256) public lastWavedAt;
-  event NewWave(address indexed from, uint256 timestamp, string message);
+  event NewWave(uint256 index, address indexed from, uint256 timestamp, string message);
 
   constructor() payable {
-    wave("Hello World!");
+    // wave("Hello World!");
   }
 
 
@@ -40,12 +41,18 @@ contract WavePortal is Ownable {
     price = newPrice;
   }
 
+  function setOdds(uint256 newOdds) public onlyOwner {
+    odds = newOdds;
+  }
+
   function setJackpot(uint256 newJackpot) public onlyOwner {
     jackpot = newJackpot;
   }
 
-  function setOdds(uint256 newOdds) public onlyOwner {
-    odds = newOdds;
+  function updateSettings(uint256 newPrice, uint256 newOdds, uint256 newJackpot) public onlyOwner {
+    setPrice(newPrice);
+    setOdds(newOdds);
+    setJackpot(newJackpot);
   }
 
 
@@ -54,7 +61,7 @@ contract WavePortal is Ownable {
     delete waves;
   }
 
-  function isPaused(bool value) public onlyOwner {
+  function pause(bool value) public onlyOwner {
     paused = value;
   }
 
@@ -67,13 +74,13 @@ contract WavePortal is Ownable {
     lastWavedAt[msg.sender] = block.timestamp;
 
     console.log("%s has waved!", msg.sender); // DEBUG
-    waves.push(Wave(msg.sender, block.timestamp, message));
+    waves.push(Wave(waves.length, msg.sender, block.timestamp, message));
 
     // Check if the sender has won the jackpot
     checkLottery(payable(msg.sender));
 
     // Alert subscribers to the new wave transaction
-    emit NewWave(msg.sender, block.timestamp, message);
+    emit NewWave(waves.length - 1, msg.sender, block.timestamp, message);
   }
 
   // Randomly award a sender with the jackpot, at the set odds
@@ -92,15 +99,19 @@ contract WavePortal is Ownable {
   }
 
   // Delete a wave from the contract
-  function deleteWave(uint256 index, address sender) public {
+  function deleteWave(uint256 index) public {
     require(waves.length > index, "Given index is invalid");
-    require(waves[index].sender == sender, "Sender does not match the given wave");
+    require(waves[index].sender == msg.sender, "Sender does not match the given wave");
     waves[index] = waves[waves.length - 1];
     waves.pop();
   }
 
 
   // Retrieve contract metadata
+  function getOwner() public view returns (address) {
+    return owner();
+  }
+
   function getBalance() public view returns (uint256) {
     return address(this).balance;
   }
@@ -111,6 +122,10 @@ contract WavePortal is Ownable {
 
   function getPrice() public view returns (uint256) {
     return price;
+  }
+
+  function getOdds() public view returns (uint256) {
+    return odds;
   }
 
   function getJackpot() public view returns (uint256) {
