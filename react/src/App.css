@@ -20,7 +20,7 @@
 
 .bio {
   text-align: center;
-  color: #F9FAFB;
+  color: #f9fafb;
   margin-top: 16px;
 }
 
@@ -32,10 +32,10 @@
 }
 
 .messageBox {
-  color: #F9FAFB;
+  color: #f9fafb;
   background-color: #111827;
   border-width: 2px;
-  border-color: #F9FAFB;
+  border-color: #f9fafb;
   border-style: solid;
   padding: 8px;
   margin-top: 16px;
@@ -43,10 +43,10 @@
 }
 
 .message {
-  color: #F9FAFB;
+  color: #f9fafb;
   background-color: #111827;
   border-width: 2px;
-  border-color: #F9FAFB;
+  border-color: #f9fafb;
   border-style: solid;
   padding: 8px;
   margin-top: 24px;
@@ -54,10 +54,10 @@
 }
 
 .textBox {
-  color: #F9FAFB;
+  color: #f9fafb;
   background-color: #111827;
   border-width: 2px;
-  border-color: #F9FAFB;
+  border-color: #f9fafb;
   border-style: solid;
   padding: 8px;
   margin-top: 16px;
@@ -84,7 +84,6 @@
   background-color: transparent;
 }
 
-
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -93,6 +92,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
