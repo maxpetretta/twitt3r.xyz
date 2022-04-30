@@ -37,15 +37,15 @@ contract WavePortal is Ownable {
     require(sent, "Failed to withdraw from contract");
   }
 
-  function setPrice(uint256 newPrice) public onlyOwner {
+  function setPrice(uint256 newPrice) internal {
     price = newPrice;
   }
 
-  function setOdds(uint256 newOdds) public onlyOwner {
+  function setOdds(uint256 newOdds) internal {
     odds = newOdds;
   }
 
-  function setJackpot(uint256 newJackpot) public onlyOwner {
+  function setJackpot(uint256 newJackpot) internal {
     jackpot = newJackpot;
   }
 
@@ -136,7 +136,7 @@ contract WavePortal is Ownable {
     return lastWinner;
   }
 
-  function getAllWaves() public view returns (Wave[] memory) {
+  function getWaves() public view returns (Wave[] memory) {
     return waves;
   }
 
