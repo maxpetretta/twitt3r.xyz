@@ -5,6 +5,9 @@ node_modules/
 artifacts/
 cache/
 
+# React
+.next
+
 # Local enviroment
 .env
 

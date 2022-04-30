@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { ethers } from "ethers"
-import "./App.css"
-import abi from "./utils/WavePortal.json"
+import abi from "../public/abi/WavePortal.json"
 
 import Web3Modal from "web3modal"
 import WalletConnectProvider from "@walletconnect/web3-provider"
@@ -23,12 +22,15 @@ const providerOptions = {
   },
 }
 
-const web3Modal = new Web3Modal({
-  providerOptions,
-  cacheProvider: true,
-})
+let web3Modal
+if (typeof window !== "undefined") {
+  web3Modal = new Web3Modal({
+    providerOptions,
+    cacheProvider: true,
+  })
+}
 
-const App = () => {
+export default function Home() {
   const [waves, setWaves] = useState([])
   const [account, setAccount] = useState("")
   const [message, setMessage] = useState("")
@@ -405,5 +407,3 @@ const App = () => {
     </div>
   )
 }
-
-export default App
