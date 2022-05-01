@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react"
 import { ethers } from "ethers"
-import abi from "../public/abi/WavePortal.json"
+import abi from "../utils/WavePortal.json"
+import React, { useEffect, useState } from "react"
 
 import Web3Modal from "web3modal"
-import WalletConnectProvider from "@walletconnect/web3-provider"
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk"
+import WalletConnectProvider from "@walletconnect/web3-provider"
 
 const providerOptions = {
   walletconnect: {
@@ -45,7 +45,8 @@ export default function Home() {
   const contractABI = abi.abi
 
   /**
-   * Connect to the user's wallet
+   * Returns the connected wallet's provider
+   * @returns {Object} Web3Provider
    */
   const loadProvider = async () => {
     try {
@@ -61,10 +62,12 @@ export default function Home() {
     }
   }
 
+  /**
+   * Connect to a wallet using web3Modal
+   */
   const connectWallet = async () => {
     try {
       await web3Modal.connect()
-
       setIsConnected(true)
       checkConnectedWallet()
     } catch (error) {
@@ -72,6 +75,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Disconnect from the user's wallet, and clear the cached provider
+   */
   const disconnectWallet = async () => {
     try {
       web3Modal.clearCachedProvider()
@@ -82,10 +88,10 @@ export default function Home() {
     }
   }
 
+  /**
+   * Check for a previously connected wallet, and if it belongs to the contract owner
+   */
   const checkConnectedWallet = async () => {
-    /*
-     * First make sure we have access to the provider
-     */
     try {
       const provider = await loadProvider()
       const accounts = await provider.listAccounts()
@@ -97,9 +103,7 @@ export default function Home() {
         setAccount(account)
         getWaves()
 
-        /*
-         * Check if this wallet belongs to the owner
-         */
+        // Check if this is the owner's wallet
         const contract = new ethers.Contract(
           contractAddress,
           contractABI,
@@ -119,6 +123,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Read the settings values from the contract, and set them in state
+   */
   const getSettings = async () => {
     try {
       const provider = await loadProvider()
@@ -140,6 +147,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Submit a new wave to the contract
+   */
   const wave = async () => {
     try {
       const provider = await loadProvider()
@@ -165,6 +175,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Get all waves from the chain, and set them in state
+   */
   const getWaves = async () => {
     try {
       const provider = await loadProvider()
@@ -174,6 +187,7 @@ export default function Home() {
         provider
       )
 
+      // Listen for new wave events
       contract.on("NewWave", (index, from, timestamp, message) => {
         console.debug("NewWave", index, from, timestamp, message)
 
@@ -192,35 +206,32 @@ export default function Home() {
     }
   }
 
+  /**
+   * Delete the specified wave from the contract
+   * @param {number} index - The wave index number
+   */
   const deleteWave = async (index) => {
     try {
-      const { ethereum } = window
+      const provider = await loadProvider()
+      const signer = provider.getSigner()
+      const contract = new ethers.Contract(contractAddress, contractABI, signer)
 
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum)
-        const signer = provider.getSigner()
-        const contract = new ethers.Contract(
-          contractAddress,
-          contractABI,
-          signer
-        )
+      const txn = await contract.deleteWave(index, { gasLimit: 300000 })
+      console.debug("Deleting...", txn.hash)
 
-        const txn = await contract.deleteWave(index, { gasLimit: 300000 })
-        console.debug("Deleting...", txn.hash)
+      await txn.wait()
+      console.debug("Deleted -- ", txn.hash)
 
-        await txn.wait()
-        console.debug("Deleted -- ", txn.hash)
-
-        let count = await contract.getTotalWaves()
-        console.debug("Retrieved total wave count...", count.toNumber())
-      } else {
-        console.log("Ethereum object doesn't exist!")
-      }
+      let count = await contract.getTotalWaves()
+      console.debug("Retrieved total wave count...", count.toNumber())
     } catch (error) {
       console.error(error)
     }
   }
 
+  /**
+   * Delete all waves from the contract, only for the owner
+   */
   const clearWaves = async () => {
     try {
       const provider = await loadProvider()
@@ -240,6 +251,10 @@ export default function Home() {
     }
   }
 
+  /**
+   * Update the setting parameters (price, odds, jackpot) , only for the owner
+   * @param {*} event - POST event from the form
+   */
   const updateSettings = async (event) => {
     try {
       event.preventDefault()
@@ -263,6 +278,9 @@ export default function Home() {
     }
   }
 
+  /**
+   * Pause all transactions to the contract, only for the owner
+   */
   const pauseContract = async () => {
     try {
       const provider = await loadProvider()
@@ -292,57 +310,46 @@ export default function Home() {
     }
   }, [])
 
-  /*
+  /**
    * Main page content
    */
   return (
-    <div className="mainContainer">
-      <div className="dataContainer">
-        <div className="header">👋 Hey there!</div>
-
-        <div className="bio">
+    <div>
+      <div>
+        <div>👋 Hey there!</div>
+        <div>
           My name is Max, and I'm learning about web3 with{" "}
           <a href="https://buildspace.so">Buildspace</a>. Connect your Ethereum
           wallet to wave at me!
         </div>
 
-        {!account && (
-          <button className="waveButton" onClick={connectWallet}>
-            Connect Wallet
-          </button>
-        )}
+        {!account && <button onClick={connectWallet}>Connect Wallet</button>}
 
         {account && (
           <>
             <input
               type="text"
               id="messageBox"
-              className="messageBox"
               placeholder="Type your message here..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <button className="waveButton" onClick={wave}>
-              Wave at Me
-            </button>
-            <button className="waveButton" onClick={disconnectWallet}>
-              Disconnect Wallet
-            </button>
+            <button onClick={wave}>Wave at Me</button>
+            <button onClick={disconnectWallet}>Disconnect Wallet</button>
           </>
         )}
 
         {account && isOwner && (
-          <div className="message">
+          <div>
             <h3>Owner Settings</h3>
             <form onSubmit={updateSettings}>
-              <div className="ownerForm">
-                <div className="ownerSettings">
+              <div>
+                <div>
                   <label>Wave Price: {price}Ξ</label>
                   <input
                     type="number"
                     step="any"
                     id="price"
-                    className="textBox"
                     placeholder="Price in Ether"
                     required
                   />
@@ -350,7 +357,6 @@ export default function Home() {
                   <input
                     type="number"
                     id="odds"
-                    className="textBox"
                     placeholder="Odds 0 - 100%"
                     required
                   />
@@ -359,29 +365,18 @@ export default function Home() {
                     type="number"
                     step="any"
                     id="jackpot"
-                    className="textBox"
                     placeholder="Prize in Ether"
                     required
                   />
                 </div>
-                <div className="ownerButtons">
-                  <button
-                    className="waveButton"
-                    type="button"
-                    onClick={clearWaves}
-                  >
+                <div>
+                  <button type="button" onClick={clearWaves}>
                     Clear All Waves
                   </button>
-                  <button
-                    className="waveButton"
-                    type="button"
-                    onClick={pauseContract}
-                  >
+                  <button type="button" onClick={pauseContract}>
                     Pause Contract
                   </button>
-                  <button className="waveButton" type="submit">
-                    Submit Changes
-                  </button>
+                  <button>Submit Changes</button>
                 </div>
               </div>
             </form>
@@ -390,13 +385,8 @@ export default function Home() {
 
         {waves.map((wave, index) => {
           return (
-            <div key={index} className="message">
-              <button
-                onClick={() => deleteWave(wave.index)}
-                className="deleteButton"
-              >
-                ✕
-              </button>
+            <div key={index}>
+              <button onClick={() => deleteWave(wave.index)}>✕</button>
               <div>Address: {wave.address}</div>
               <div>Time: {wave.timestamp.toString()}</div>
               <div>Message: {wave.message}</div>
