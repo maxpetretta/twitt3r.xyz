@@ -1,14 +1,11 @@
 {
-  "name": "buildspace-smart-contracts",
-  "version": "1.0.0",
-  "description": "",
+  "private": true,
+  "license": "MIT",
   "main": "run.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.2",
+    "dotenv": "^10.0.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
@@ -16,9 +13,5 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.4.7",
     "hardhat": "^2.6.6"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.3.2",
-    "dotenv": "^10.0.0"
   }
 }

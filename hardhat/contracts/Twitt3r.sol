@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol"; // DEBUG
 
-contract WavePortal is Ownable {
+contract Twitt3r is Ownable {
   bool public paused = false;
   uint256 public price = 0.0001 ether;
   uint256 public jackpot = 0.001 ether;
@@ -12,19 +12,19 @@ contract WavePortal is Ownable {
   address public lastWinner;
   uint256 private seed;
   
-  struct Wave {
+  struct Tweet {
     uint256 index;
     address sender;
     uint256 timestamp;
     string message;
   }
 
-  Wave[] public waves;
-  mapping(address => uint256) public lastWavedAt;
-  event NewWave(uint256 index, address indexed from, uint256 timestamp, string message);
+  Tweet[] public tweets;
+  mapping(address => uint256) public lastTweetdAt;
+  event NewTweet(uint256 index, address indexed from, uint256 timestamp, string message);
 
   constructor() payable {
-    // wave("Hello World!");
+    // tweet("Hello World!");
   }
 
 
@@ -58,7 +58,7 @@ contract WavePortal is Ownable {
 
   // Manage the contract's state
   function clear() public onlyOwner {
-    delete waves;
+    delete tweets;
   }
 
   function pause(bool value) public onlyOwner {
@@ -66,21 +66,21 @@ contract WavePortal is Ownable {
   }
 
 
-  // Send a message (wave) using the contract
-  function wave(string memory message) public payable {
-    require(!paused, "The wave portal has been paused!");
+  // Send a message (tweet) using the contract
+  function tweet(string memory message) public payable {
+    require(!paused, "The tweet portal has been paused!");
     require(msg.value >= price, "Amount sent is incorrect");
-    require(lastWavedAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before waving again!");
-    lastWavedAt[msg.sender] = block.timestamp;
+    require(lastTweetdAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before waving again!");
+    lastTweetdAt[msg.sender] = block.timestamp;
 
-    console.log("%s has waved!", msg.sender); // DEBUG
-    waves.push(Wave(waves.length, msg.sender, block.timestamp, message));
+    console.log("%s has tweetd!", msg.sender); // DEBUG
+    tweets.push(Tweet(tweets.length, msg.sender, block.timestamp, message));
 
     // Check if the sender has won the jackpot
     checkLottery(payable(msg.sender));
 
-    // Alert subscribers to the new wave transaction
-    emit NewWave(waves.length - 1, msg.sender, block.timestamp, message);
+    // Alert subscribers to the new tweet transaction
+    emit NewTweet(tweets.length - 1, msg.sender, block.timestamp, message);
   }
 
   // Randomly award a sender with the jackpot, at the set odds
@@ -98,12 +98,12 @@ contract WavePortal is Ownable {
     }
   }
 
-  // Delete a wave from the contract
-  function deleteWave(uint256 index) public {
-    require(waves.length > index, "Given index is invalid");
-    require(waves[index].sender == msg.sender, "Sender does not match the given wave");
-    waves[index] = waves[waves.length - 1];
-    waves.pop();
+  // Delete a tweet from the contract
+  function deleteTweet(uint256 index) public {
+    require(tweets.length > index, "Given index is invalid");
+    require(tweets[index].sender == msg.sender, "Sender does not match the given tweet");
+    tweets[index] = tweets[tweets.length - 1];
+    tweets.pop();
   }
 
 
@@ -136,11 +136,11 @@ contract WavePortal is Ownable {
     return lastWinner;
   }
 
-  function getWaves() public view returns (Wave[] memory) {
-    return waves;
+  function getTweets() public view returns (Tweet[] memory) {
+    return tweets;
   }
 
-  function getTotalWaves() public view returns (uint256) {
-    return waves.length;
+  function getTotalTweets() public view returns (uint256) {
+    return tweets.length;
   }
 }

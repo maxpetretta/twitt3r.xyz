@@ -3,34 +3,34 @@ const main = async () => {
   const [owner] = await hre.ethers.getSigners();
 
   // Deploy the contract
-  const waveContractFactory = await hre.ethers.getContractFactory('WavePortal');
-  const waveContract = await waveContractFactory.deploy({
+  const contractFactory = await hre.ethers.getContractFactory('Twitt3r');
+  const contract = await contractFactory.deploy({
     value: hre.ethers.utils.parseEther('0.1'), // Initial contract balance, for paying out awards
   });
-  await waveContract.deployed();
+  await contract.deployed();
 
-  console.log("\nContract deployed to:", waveContract.address);
+  console.log("\nContract deployed to:", contract.address);
   console.log("Contract deployed by:", owner.address, "\n");
 
   let contractBalance = await hre.ethers.provider.getBalance(
-    waveContract.address
+    contract.address
   );
   console.log(
     'Contract balance:',
     hre.ethers.utils.formatEther(contractBalance)
   );
 
-  let waveCount;
-  waveCount = await waveContract.getTotalWaves();
+  let count;
+  count = await contract.getTotalTweets();
 
-  // Send a test wave on the local blockchain
-  let waveTxn = await waveContract.wave('This is a test wave');
-  await waveTxn.wait();
+  // Send a test tweet on the local blockchain
+  let txn = await contract.tweet('This is a test tweet');
+  await txn.wait();
 
-  waveCount = await waveContract.getTotalWaves();
+  count = await contract.getTotalTweets();
 
   contractBalance = await hre.ethers.provider.getBalance(
-    waveContract.address
+    contract.address
   );
   console.log(
     'Contract balance:',
@@ -38,8 +38,8 @@ const main = async () => {
   );
   
   // Retrieve metadata for all senders
-  let allWaves = await waveContract.getAllWaves();
-  console.log(allWaves);
+  let tweets = await contract.getAllTweets();
+  console.log(tweets);
 }; 
 
 // Run contract asynchronously
