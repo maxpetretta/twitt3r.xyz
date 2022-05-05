@@ -13,20 +13,27 @@ contract Twitt3r is Ownable {
   uint256 private seed;
   
   struct Tweet {
-    uint256 index;
-    address sender;
+    address from;
     uint256 timestamp;
     string message;
+    bool deleted;
   }
 
-  Tweet[] public tweets;
-  mapping(address => uint256) public lastTweetdAt;
-  event NewTweet(uint256 index, address indexed from, uint256 timestamp, string message);
+  // Mapped struct with index, see: https://ethereum.stackexchange.com/a/13168
+  uint256 public id = 0;
+  uint256[] public tweetIDs;
+  mapping(uint256 => Tweet) public tweets;
+
+  mapping(address => uint256) public lastTweetedAt;
+  event NewTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message);
+  event EditTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message);
+  event DeleteTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message);
+  event ClearTweets(uint256 id);
+  event WonLottery(address winner, uint256 jackpot);
 
   constructor() payable {
     // tweet("Hello World!");
   }
-
 
   // Manage the contract's balance
   function deposit() public payable {}
@@ -37,87 +44,80 @@ contract Twitt3r is Ownable {
     require(sent, "Failed to withdraw from contract");
   }
 
-  function setPrice(uint256 newPrice) internal {
-    price = newPrice;
-  }
-
-  function setOdds(uint256 newOdds) internal {
-    odds = newOdds;
-  }
-
-  function setJackpot(uint256 newJackpot) internal {
-    jackpot = newJackpot;
-  }
-
-  function updateSettings(uint256 newPrice, uint256 newOdds, uint256 newJackpot) public onlyOwner {
-    setPrice(newPrice);
-    setOdds(newOdds);
-    setJackpot(newJackpot);
-  }
-
-
-  // Manage the contract's state
-  function clear() public onlyOwner {
-    delete tweets;
-  }
-
-  function pause(bool value) public onlyOwner {
-    paused = value;
-  }
-
-
   // Send a message (tweet) using the contract
-  function tweet(string memory message) public payable {
-    require(!paused, "The tweet portal has been paused!");
+  function tweet(string memory _message) public payable {
+    require(!paused, "Twitt3r has been paused!");
     require(msg.value >= price, "Amount sent is incorrect");
-    require(lastTweetdAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before waving again!");
-    lastTweetdAt[msg.sender] = block.timestamp;
+    require(lastTweetedAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before tweeting again!");
+    lastTweetedAt[msg.sender] = block.timestamp;
 
-    console.log("%s has tweetd!", msg.sender); // DEBUG
-    tweets.push(Tweet(tweets.length, msg.sender, block.timestamp, message));
+    console.log("%s has tweeted!", msg.sender); // DEBUG
+    tweets[id] = Tweet(msg.sender, block.timestamp, _message, false);
+    tweetIDs.push(id);
 
     // Check if the sender has won the jackpot
     checkLottery(payable(msg.sender));
 
     // Alert subscribers to the new tweet transaction
-    emit NewTweet(tweets.length - 1, msg.sender, block.timestamp, message);
+    emit NewTweet(id, msg.sender, block.timestamp, _message);
+    id++;
   }
 
-  // Randomly award a sender with the jackpot, at the set odds
-  function checkLottery(address payable sender) private {
-    require(address(this).balance >= jackpot, "Contract balance is insufficient");
-    uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
-    console.log("Random # generated: %s", randomNumber); // DEBUG
-    seed = randomNumber;
+  // Edit an existing tweet's message
+  function editTweet(uint256 _id, string memory _message) public {
+    require(!paused, "Twitt3r has been paused!");
+    require(tweets[_id].timestamp != 0, "Given ID is invalid");
+    require(!tweets[_id].deleted, "Given tweet is deleted!");
+    require(tweets[_id].from == msg.sender, "Sender does not match the given tweet");
+    tweets[_id].message = _message;
 
-    if (randomNumber < odds) {
-      console.log("%s has won!", msg.sender); // DEBUG
-
-      (bool sent, ) = sender.call{value: jackpot}("");
-      require(sent, "Failed to withdraw from contract");
-    }
+    emit EditTweet(_id, msg.sender, block.timestamp, tweets[_id].message);
   }
 
   // Delete a tweet from the contract
-  function deleteTweet(uint256 index) public {
-    require(tweets.length > index, "Given index is invalid");
-    require(tweets[index].sender == msg.sender, "Sender does not match the given tweet");
-    tweets[index] = tweets[tweets.length - 1];
-    tweets.pop();
+  function deleteTweet(uint256 _id) public {
+    require(!paused, "Twitt3r has been paused!");
+    require(tweets[_id].timestamp != 0, "Given ID is invalid");
+    require(!tweets[_id].deleted, "Given tweet is already deleted!");
+    require(tweets[_id].from == msg.sender, "Sender does not match the given tweet");
+    tweets[_id].deleted = true;
+
+    emit DeleteTweet(_id, msg.sender, block.timestamp, tweets[_id].message);
   }
 
+  // Manage the contract's state
+  function clear() public onlyOwner {
+    uint256 lastID = id;
+    for (uint256 i = 0; i < tweetIDs.length; i++) {
+      delete tweets[i];
+    }
+    delete tweetIDs;
+    id = 0;
+
+    emit ClearTweets(lastID);
+  }
+
+  function pause(bool _value) public onlyOwner {
+    paused = _value;
+  }
+
+  function updateSettings(uint256 _newPrice, uint256 _newOdds, uint256 _newJackpot) public onlyOwner {
+    setPrice(_newPrice);
+    setOdds(_newOdds);
+    setJackpot(_newJackpot);
+  }
 
   // Retrieve contract metadata
+  function isPaused() public view returns (bool) {
+    return paused;
+  }
+
   function getOwner() public view returns (address) {
     return owner();
   }
 
   function getBalance() public view returns (uint256) {
     return address(this).balance;
-  }
-
-  function isPaused() public view returns (bool) {
-    return paused;
   }
 
   function getPrice() public view returns (uint256) {
@@ -137,10 +137,42 @@ contract Twitt3r is Ownable {
   }
 
   function getTweets() public view returns (Tweet[] memory) {
-    return tweets;
+    Tweet[] memory allTweets = new Tweet[](tweetIDs.length);
+    for (uint256 i = 0; i < tweetIDs.length; i++) {
+      allTweets[i] = tweets[tweetIDs[i]];
+    }
+    return allTweets;
   }
 
   function getTotalTweets() public view returns (uint256) {
-    return tweets.length;
+    return tweetIDs.length;
+  }
+
+  function setPrice(uint256 _newPrice) internal {
+    price = _newPrice;
+  }
+
+  function setOdds(uint256 _newOdds) internal {
+    odds = _newOdds;
+  }
+
+  function setJackpot(uint256 _newJackpot) internal {
+    jackpot = _newJackpot;
+  }
+
+  // Randomly award a sender with the jackpot, at the set odds
+  function checkLottery(address payable _sender) private {
+    require(address(this).balance >= jackpot, "Contract balance is insufficient!");
+    uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
+    console.log("Random # generated: %s", randomNumber); // DEBUG
+    seed = randomNumber;
+
+    if (randomNumber < odds) {
+      console.log("%s has won!", msg.sender); // DEBUG
+
+      (bool sent, ) = _sender.call{value: jackpot}("");
+      require(sent, "Failed to withdraw from contract");
+      emit WonLottery(_sender, jackpot);
+    }
   }
 }
