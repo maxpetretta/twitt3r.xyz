@@ -5,7 +5,7 @@ import { ethers } from "ethers"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function TweetList(props) {
-  const [tweets, setTweets] = useState([])
+  const [tweets, setTweets] = useState(new Map())
 
   /**
    * Get all tweets from the chain, and set them in state
@@ -19,19 +19,37 @@ export default function TweetList(props) {
         provider
       )
 
-      // Listen for new tweet events
-      contract.on("NewTweet", (index, from, timestamp, message) => {
-        console.debug("NewTweet", index, from, timestamp, message)
+      // Listen for NewTweet events
+      contract.on("NewTweet", (id, from, timestamp, message) => {
+        console.debug("NewTweet", id.toNumber(), from, new Date(timestamp * 1000), message)
+    
+        setTweets((prevState) => {
+          let newState = new Map(prevState)
+          newState.set(id.toNumber(), {from: from, timestamp: new Date(timestamp * 1000), message: message})
+          return newState
+        })
+      })
 
-        setTweets((prevState) => [
-          ...prevState,
-          {
-            index: index,
-            address: from,
-            timestamp: new Date(timestamp * 1000),
-            message: message,
-          },
-        ])
+      // Listen for EditTweet events
+      contract.on("EditTweet", (id, from, timestamp, message) => {
+        console.debug("EditTweet", id.toNumber(), from, new Date(timestamp * 1000), message)
+
+        setTweets((prevState) => {
+          let newState = new Map(prevState)
+          newState.set(id.toNumber(), {from: from, timestamp: new Date(timestamp * 1000), message: message})
+          return newState
+        })
+      })
+
+      // Listen for DeleteTweet events
+      contract.on("DeleteTweet", (id, from, timestamp, message) => {
+        console.debug("DeleteTweet", id.toNumber(), from, new Date(timestamp * 1000), message)
+
+        setTweets((prevState) => {
+          let newState = new Map(prevState)
+          newState.delete(id.toNumber())
+          return newState
+        })
       })
     } catch (error) {
       console.error(error)
@@ -44,12 +62,13 @@ export default function TweetList(props) {
   useEffect(() => {
     getTweets()
   }, [])
+
   return (
     <section>
-      {tweets.map((tweet) => {
+      {Array.from(tweets, ([id, tweet]) => {
         return (
           <Tweet
-            key={tweet.index}
+            key={id}
             tweet={tweet}
             loadProvider={props.loadProvider}
           />

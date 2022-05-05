@@ -35,7 +35,7 @@ if (typeof window !== "undefined") {
   })
 }
 
-export default function Home() {
+export default function Index() {
   const [account, setAccount] = useState("")
   const [isOwner, setIsOwner] = useState(false)
 
@@ -110,10 +110,10 @@ export default function Home() {
       <section>
         <h1>Welcome to Twitt3r</h1>
         <p>
-          Twitt3r is a decentralized version of Twitter built on the Ethereum
-          blockchain. Connect your wallet to send, edit, delete, and like
-          tw33ts! You can also check out the source code on{" "}
-          <a href="https://github.com/Web3Modal/web3modal">GitHub</a>
+          Twitt3r is a decentralized web3 version of Twitter built on the
+          Ethereum blockchain. Connect your wallet to send, edit (!!!), delete,
+          and like tw33ts! You can also check out the source code on{" "}
+          <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
         </p>
       </section>
       {account && isOwner && <Controls loadProvider={loadProvider} />}
@@ -125,7 +125,7 @@ export default function Home() {
         </p>
         <p>
           Check out the source code on{" "}
-          <a href="https://github.com/Web3Modal/web3modal">GitHub</a>
+          <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
         </p>
       </footer>
     </>

@@ -85,7 +85,7 @@ export default function Controls(props) {
    */
   const pauseContract = async () => {
     try {
-      const provider = await loadProvider()
+      const provider = await props.loadProvider()
       const signer = provider.getSigner()
       const contract = new ethers.Contract(contractAddress, contractABI, signer)
 
