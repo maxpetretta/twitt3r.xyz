@@ -1,19 +1,19 @@
 // Deploy smart contract to Rinkeby testnet
 const main = async () => {
-  const [deployer] = await hre.ethers.getSigners();
-  const accountBalance = await deployer.getBalance();
+  const [owner] = await ethers.getSigners();
+  const balance = await owner.getBalance();
 
-  console.log('Deploying contracts with account: ', deployer.address);
-  console.log('Account balance: ', accountBalance.toString());
+  console.log('Deploying contracts with account: ', owner.address);
+  console.log('Account balance: ', balance.toString());
 
-  const token = await hre.ethers.getContractFactory('Twitt3r');
-  const portal = await token.deploy({
-    value: hre.ethers.utils.parseEther('1.0'), // Initial contract balance, for paying out awards
+  const contract = await ethers.getContractFactory('Twitt3r');
+  const txn = await contract.deploy({
+    value: ethers.utils.parseEther('1.0'), // Initial contract balance, for paying out awards
   });
 
-  await portal.deployed();
+  await txn.deployed();
 
-  console.log('Contract address: ', portal.address);
+  console.log('Contract address: ', txn.address);
 };
 
 // Run contract deployment asynchronously

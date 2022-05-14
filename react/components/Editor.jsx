@@ -1,33 +1,59 @@
 import { useState } from "react"
-import { ethers } from "ethers"
+import { useContractRead, useContractWrite } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Editor(props) {
   const [message, setMessage] = useState("")
 
   /**
+   * Contract hooks
+   */
+   const { data: priceData, error: priceError, refetch: priceRefetch } = useContractRead(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "getPrice"
+  )
+
+   const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "getTotalTweets"
+  )
+
+   const { data: tweetData, error: tweetError, write: tweet } = useContractWrite(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "sendTweet",
+    {
+      onSuccess(data) {
+        const count = totalTweetsData
+        console.debug("Sent tweet --", data.hash)
+        console.debug("Retrieved total tweet count --", count.toNumber())
+      },
+      onError(error) {
+        console.error("Transaction failed -- ", error)
+      }
+    }
+  )
+
+  /**
    * Submit a new tweet to the contract
    */
-  const tweet = async () => {
+  const sendTweet = async () => {
     try {
-      const provider = await props.loadProvider()
-      const signer = provider.getSigner()
-      const contract = new ethers.Contract(contractAddress, contractABI, signer)
-
-      let count = await contract.getTotalTweets()
-      console.debug("Retrieved total tweet count...", count.toNumber())
-
-      const txn = await contract.tweet(message, {
-        value: ethers.utils.parseUnits("0.0002"),
-        gasLimit: 300000,
+      priceRefetch().then((value) => {
+        console.log(value)
+        sendTweet({
+          args: message.toString(),
+          overrides: { value: value.data }
+        })
       })
-      console.debug("Mining...", txn.hash)
-
-      await txn.wait()
-      console.debug("Mined -- ", txn.hash)
-
-      count = await contract.getTotalTweets()
-      console.debug("Retrieved total tweet count...", count.toNumber())
     } catch (error) {
       console.error(error)
     }
@@ -42,7 +68,7 @@ export default function Editor(props) {
         placeholder="What's happening?"
         onChange={(e) => setMessage(e.target.value)}
       />
-      <button onClick={tweet}>Tw33t</button>
+      <button onClick={sendTweet}>Tw33t</button>
     </section>
   )
 }

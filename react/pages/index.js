@@ -4,82 +4,37 @@ import Controls from "../components/Controls"
 import TweetList from "../components/TweetList"
 
 import { useEffect, useState } from "react"
-import { ethers } from "ethers"
+import { useAccount, useContractRead } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
-import Web3Modal from "web3modal"
-import CoinbaseWalletSDK from "@coinbase/wallet-sdk"
-import WalletConnectProvider from "@walletconnect/web3-provider"
-
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      infuraId: process.env.REACT_APP_INFURA_ID,
-    },
-  },
-  coinbasewallet: {
-    package: CoinbaseWalletSDK,
-    options: {
-      appName: "web3-twitter",
-      infuraId: process.env.REACT_APP_INFURA_ID,
-    },
-  },
-}
-
-let web3Modal
-if (typeof window !== "undefined") {
-  web3Modal = new Web3Modal({
-    providerOptions,
-    cacheProvider: true,
-  })
-}
-
 export default function Index() {
-  const [account, setAccount] = useState("")
+  const { data: account, refetch: accountRefetch } = useAccount()
   const [isOwner, setIsOwner] = useState(false)
 
   /**
-   * Returns the connected wallet's provider
-   * @returns {Object} provider
+   * Contract hooks
    */
-  const loadProvider = async () => {
-    try {
-      if (web3Modal.cachedProvider) {
-        const instance = await web3Modal.connect()
-        const provider = new ethers.providers.Web3Provider(instance)
-        return provider
-      } else {
-        console.debug("Connect wallet first!")
-      }
-    } catch (error) {
-      console.error(error)
+  const { data: ownerData } = useContractRead(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "getOwner",
+    {
+      enabled: false,
     }
-  }
+  )
 
   /**
    * Check for a previously connected wallet, and if it belongs to the contract owner
    */
   const checkConnectedWallet = async () => {
     try {
-      const provider = await loadProvider()
-      const accounts = await provider.listAccounts()
-
-      if (accounts.length !== 0) {
-        const account = accounts[0]
-        console.debug("Found an authorized account:", account)
-
-        setAccount(account)
+      if (account) {
+        console.debug("Found an authorized account:", account.address)
 
         // Check if this is the owner's wallet
-        const contract = new ethers.Contract(
-          contractAddress,
-          contractABI,
-          provider
-        )
-        const owner = await contract.getOwner()
-
-        if (owner.toUpperCase() === accounts[0].toUpperCase()) {
+        if (ownerData.toUpperCase() === account.address.toUpperCase()) {
           setIsOwner(true)
         }
       } else {
@@ -90,23 +45,18 @@ export default function Index() {
     }
   }
 
-  /*
+  /**
    * On page load, check for an existing wallet
    */
   useEffect(() => {
-    if (account) {
+    accountRefetch().then(() => {
       checkConnectedWallet()
-    }
-  }, [])
+    })
+  })
 
   return (
     <>
-      <Header
-        account={account}
-        setAccount={setAccount}
-        checkConnectedWallet={checkConnectedWallet}
-        web3Modal={web3Modal}
-      />
+      <Header />
       <section>
         <h1>Welcome to Twitt3r</h1>
         <p>
@@ -116,9 +66,9 @@ export default function Index() {
           <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
         </p>
       </section>
-      {account && isOwner && <Controls loadProvider={loadProvider} />}
-      {account && <Editor loadProvider={loadProvider} />}
-      <TweetList loadProvider={loadProvider} />
+      {account && isOwner && <Controls />}
+      {account && <Editor />}
+      <TweetList />
       <footer>
         <p>
           Built by <a href="https://maxpetretta.com">Max Petretta</a>

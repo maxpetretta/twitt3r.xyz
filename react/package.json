@@ -10,14 +10,13 @@
     "prepare": "cd .. && husky install react/.husky"
   },
   "dependencies": {
-    "@coinbase/wallet-sdk": "^3.0.10",
-    "@walletconnect/web3-provider": "^1.7.8",
+    "@rainbow-me/rainbowkit": "^0.1.0",
     "dotenv": "^16.0.0",
-    "ethers": "^5.4.4",
+    "ethers": "^5.6.5",
     "next": "^12.1.5",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "web3modal": "^1.9.7"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "wagmi": "^0.3.4"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.5",

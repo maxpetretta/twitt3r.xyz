@@ -45,7 +45,7 @@ contract Twitt3r is Ownable {
   }
 
   // Send a message (tweet) using the contract
-  function tweet(string memory _message) public payable {
+  function sendTweet(string memory _message) public payable {
     require(!paused, "Twitt3r has been paused!");
     require(msg.value >= price, "Amount sent is incorrect");
     require(lastTweetedAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before tweeting again!");

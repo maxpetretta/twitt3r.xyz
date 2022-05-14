@@ -1,26 +1,46 @@
-import { useState } from "react"
-import { ethers } from "ethers"
+import { useContractRead, useContractWrite } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Tweet(props) {
   /**
+   * Contract hooks
+   */
+   const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "getTotalTweets"
+  )
+
+   const { data: deleteData, error: deleteError, write: deleteTweet } = useContractWrite(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "deleteTweet",
+    {
+      onSuccess(data) {
+        const count = totalTweetsData
+        console.debug("Deleted --", data.hash)
+        console.debug("Retrieved total tweet count --", count.toNumber())
+      },
+      onError(error) {
+        console.error("Transaction failed -- ", error)
+      }
+    }
+  )
+
+
+  /**
    * Delete the specified tweet from the contract
    * @param {number} id - The tweet ID number
    */
-  const deleteTweet = async (id) => {
+  const deleteSelectedTweet = async (id) => {
     try {
-      const provider = await props.loadProvider()
-      const signer = provider.getSigner()
-      const contract = new ethers.Contract(contractAddress, contractABI, signer)
-
-      const txn = await contract.deleteTweet(id, { gasLimit: 300000 })
-      console.debug("Deleting...", txn.hash)
-
-      await txn.wait()
-      console.debug("Deleted -- ", txn.hash)
-
-      let count = await contract.getTotalTweets()
-      console.debug("Retrieved total tweet count...", count.toNumber())
+      deleteTweet({
+        args: [id]
+      })
     } catch (error) {
       console.error(error)
     }
@@ -29,7 +49,7 @@ export default function Tweet(props) {
   return (
     <>
       <div>
-        <button onClick={() => deleteTweet(props.tweet.id)}>✕</button>
+        <button onClick={() => deleteSelectedTweet(props.id)}>✕</button>
         <div>From: {props.tweet.from}</div>
         <div>Time: {props.tweet.timestamp.toString()}</div>
         <div>Message: {props.tweet.message}</div>
