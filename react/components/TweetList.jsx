@@ -1,6 +1,6 @@
 import Tweet from "./Tweet"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useContractEvent } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
@@ -63,7 +63,9 @@ export default function TweetList(props) {
 
   return (
     <section>
+      <p>test</p>
       {Array.from(tweets, ([id, tweet]) => {
+        console.log("here")
         return (
           <Tweet
             id={id}

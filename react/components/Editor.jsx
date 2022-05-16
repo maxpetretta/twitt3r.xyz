@@ -24,17 +24,18 @@ export default function Editor(props) {
     "getTotalTweets"
   )
 
-   const { data: tweetData, error: tweetError, write: tweet } = useContractWrite(
+   const { data: tweetData, error: tweetError, write: newTweet } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "sendTweet",
+    "newTweet",
     {
       onSuccess(data) {
-        const count = totalTweetsData
-        console.debug("Sent tweet --", data.hash)
-        console.debug("Retrieved total tweet count --", count.toNumber())
+        totalTweetsRefetch().then((value) => {
+          console.debug("Tweeted --", data.hash)
+          console.debug("Retrieved total tweet count --", value.data.toNumber())
+        })
       },
       onError(error) {
         console.error("Transaction failed -- ", error)
@@ -48,8 +49,7 @@ export default function Editor(props) {
   const sendTweet = async () => {
     try {
       priceRefetch().then((value) => {
-        console.log(value)
-        sendTweet({
+        newTweet({
           args: message.toString(),
           overrides: { value: value.data }
         })

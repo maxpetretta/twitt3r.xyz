@@ -8,7 +8,8 @@ import { useAccount, useContractRead } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Index() {
-  const { data: account, refetch: accountRefetch } = useAccount()
+  const { data: account } = useAccount()
+  const [isConnected, setIsConnected] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
 
   /**
@@ -31,13 +32,15 @@ export default function Index() {
   const checkConnectedWallet = async () => {
     try {
       if (account) {
-        console.debug("Found an authorized account:", account.address)
+        setIsConnected(true)
+        console.log("Found an authorized account:", account.address)
 
         // Check if this is the owner's wallet
         if (ownerData.toUpperCase() === account.address.toUpperCase()) {
           setIsOwner(true)
         }
       } else {
+        setIsConnected(false)
         console.log("No authorized account found")
       }
     } catch (error) {
@@ -49,10 +52,10 @@ export default function Index() {
    * On page load, check for an existing wallet
    */
   useEffect(() => {
-    accountRefetch().then(() => {
+    if (account) {
       checkConnectedWallet()
-    })
-  })
+    }
+  }, [account])
 
   return (
     <>
@@ -66,8 +69,8 @@ export default function Index() {
           <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
         </p>
       </section>
-      {account && isOwner && <Controls />}
-      {account && <Editor />}
+      {isConnected && isOwner && <Controls />}
+      {isConnected && <Editor />}
       <TweetList />
       <footer>
         <p>

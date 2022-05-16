@@ -8,7 +8,7 @@ export default function Controls(props) {
   const [odds, setOdds] = useState(0)
   const [jackpot, setJackpot] = useState(0)
 
-  const account = useAccount()
+  const { data: account } = useAccount()
 
   /**
    * Contract hooks
@@ -113,13 +113,15 @@ export default function Controls(props) {
    */
   const getSettings = async () => {
     try {
-      priceRefetch()
-      oddsRefetch()
-      jackpotRefetch()
-  
-      setPrice(ethers.utils.formatEther(priceData))
-      setOdds(ethers.utils.formatUnits(oddsData, 0))
-      setJackpot(ethers.utils.formatEther(jackpotData))
+      priceRefetch().then((value) => {
+        setPrice(ethers.utils.formatEther(value.data))
+      })
+      oddsRefetch().then((value) => {
+        setOdds(ethers.utils.formatUnits(value.data, 0))
+      })
+      jackpotRefetch().then((value) => {
+        setJackpot(ethers.utils.formatEther(value.data))
+      })
     } catch (error) {
       console.error(error)
     }
@@ -178,7 +180,14 @@ export default function Controls(props) {
     if (account) {
       getSettings()
     }
-  }, [])
+
+    // Cleanup function for settings
+    return () => {
+      setPrice(price)
+      setOdds(odds)
+      setJackpot(jackpot)
+    }
+  }, [account])
 
   return (
     <section>
