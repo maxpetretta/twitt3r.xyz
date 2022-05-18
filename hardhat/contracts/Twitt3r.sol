@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "hardhat/console.sol"; // DEBUG
 
-contract Twitt3r is Ownable {
-  bool public paused = false;
+contract Twitt3r is Ownable, Pausable {
   uint256 public price = 0.0001 ether;
   uint256 public jackpot = 0.001 ether;
   uint256 public odds = 10;
@@ -45,9 +45,9 @@ contract Twitt3r is Ownable {
   }
 
   // Send a message (tweet) using the contract
-  function newTweet(string memory _message) public payable {
-    require(!paused, "Twitt3r has been paused!");
+  function newTweet(string memory _message) public payable whenNotPaused {
     require(msg.value >= price, "Amount sent is incorrect");
+    require(bytes(_message).length <= 280, "Limit is 280 characters!");
     require(lastTweetedAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before tweeting again!");
     lastTweetedAt[msg.sender] = block.timestamp;
 
@@ -64,19 +64,18 @@ contract Twitt3r is Ownable {
   }
 
   // Edit an existing tweet's message
-  function editTweet(uint256 _id, string memory _message) public {
-    require(!paused, "Twitt3r has been paused!");
+  function editTweet(uint256 _id, string memory _message) public whenNotPaused {
     require(tweets[_id].timestamp != 0, "Given ID is invalid");
     require(!tweets[_id].deleted, "Given tweet is deleted!");
     require(tweets[_id].from == msg.sender, "Sender does not match the given tweet");
+    require(bytes(_message).length <= 280, "Limit is 280 characters!");
     tweets[_id].message = _message;
 
     emit EditTweet(_id, msg.sender, block.timestamp, tweets[_id].message);
   }
 
   // Delete a tweet from the contract
-  function deleteTweet(uint256 _id) public {
-    require(!paused, "Twitt3r has been paused!");
+  function deleteTweet(uint256 _id) public whenNotPaused {
     require(tweets[_id].timestamp != 0, "Given ID is invalid");
     require(!tweets[_id].deleted, "Given tweet is already deleted!");
     require(tweets[_id].from == msg.sender, "Sender does not match the given tweet");
@@ -97,8 +96,12 @@ contract Twitt3r is Ownable {
     emit ClearTweets(lastID);
   }
 
-  function pause(bool _value) public onlyOwner {
-    paused = _value;
+  function pause() public onlyOwner {
+    _pause();
+  }
+
+  function unpause() public onlyOwner {
+    _unpause();
   }
 
   function updateSettings(uint256 _newPrice, uint256 _newOdds, uint256 _newJackpot) public onlyOwner {
@@ -109,7 +112,7 @@ contract Twitt3r is Ownable {
 
   // Retrieve contract metadata
   function isPaused() public view returns (bool) {
-    return paused;
+    return paused();
   }
 
   function getOwner() public view returns (address) {
