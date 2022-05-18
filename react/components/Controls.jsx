@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { useAccount, useContractRead, useContractWrite } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract"
 
-export default function Controls(props) {
+export default function Controls() {
   const [price, setPrice] = useState(0)
   const [odds, setOdds] = useState(0)
   const [jackpot, setJackpot] = useState(0)

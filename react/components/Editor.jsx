@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useContractRead, useContractWrite } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
-export default function Editor(props) {
+export default function Editor() {
   const [message, setMessage] = useState("")
 
   /**

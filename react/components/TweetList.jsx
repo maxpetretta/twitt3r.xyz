@@ -1,10 +1,9 @@
 import Tweet from "./Tweet"
-
 import { useState } from "react"
 import { useContractEvent } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
-export default function TweetList(props) {
+export default function TweetList() {
   const [tweets, setTweets] = useState(new Map())
 
   /**

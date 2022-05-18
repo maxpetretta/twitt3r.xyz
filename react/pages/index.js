@@ -1,4 +1,4 @@
-import Header from "../components/Header"
+import Layout from "../components/Layout"
 import Editor from "../components/Editor"
 import Controls from "../components/Controls"
 import TweetList from "../components/TweetList"
@@ -59,28 +59,20 @@ export default function Index() {
 
   return (
     <>
-      <Header />
-      <section>
-        <h1>Welcome to Twitt3r</h1>
-        <p>
-          Twitt3r is a decentralized web3 version of Twitter built on the
-          Ethereum blockchain. Connect your wallet to send, edit (!!!), delete,
-          and like tw33ts! You can also check out the source code on{" "}
-          <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
-        </p>
-      </section>
-      {isConnected && isOwner && <Controls />}
-      {isConnected && <Editor />}
-      <TweetList />
-      <footer>
-        <p>
-          Built by <a href="https://maxpetretta.com">Max Petretta</a>
-        </p>
-        <p>
-          Check out the source code on{" "}
-          <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
-        </p>
-      </footer>
+      <Layout>
+        <section>
+          <h1>Welcome to Twitt3r</h1>
+          <p>
+            Twitt3r is a decentralized web3 version of Twitter built on the
+            Ethereum blockchain. Connect your wallet to send, edit (!!!),
+            delete, and like tw33ts! You can also check out the source code on{" "}
+            <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
+          </p>
+        </section>
+        {isConnected && isOwner && <Controls />}
+        {isConnected && <Editor />}
+        <TweetList />
+      </Layout>
     </>
   )
 }
