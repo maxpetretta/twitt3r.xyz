@@ -108,6 +108,26 @@ export default function Controls(props) {
     }
   )
 
+  const { data: unpauseData, error: unpauseError, write: unpause } = useContractWrite(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "unpause",
+    {
+      onSuccess(data) {
+        let status
+        isPausedRefetch().then((value) => {
+          status = value.data ? "Unpaused" : "Paused"
+          console.debug(status, "--", data.hash)
+        })
+      },
+      onError(error) {
+        console.error("Transaction failed -- ", error)
+      }
+    }
+  )
+
   /**
    * Read the settings values from the contract, and set them in state
    */
@@ -164,10 +184,12 @@ export default function Controls(props) {
   const pauseContract = () => {
     try {
       console.debug("Checked contract status, pause =", isPausedData.toString())
-  
-      pause({
-        args: [!isPausedData]
-      })
+
+      if (isPausedData) {
+        unpause()
+      } else {
+        pause()
+      }
     } catch (error) {
       console.error(error)
     }

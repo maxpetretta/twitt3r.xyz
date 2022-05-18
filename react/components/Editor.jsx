@@ -65,6 +65,7 @@ export default function Editor(props) {
       <input
         type="text"
         value={message}
+        maxLength="280"
         placeholder="What's happening?"
         onChange={(e) => setMessage(e.target.value)}
       />

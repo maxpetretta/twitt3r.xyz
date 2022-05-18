@@ -61,11 +61,24 @@ export default function TweetList(props) {
     }
   )
 
+  useContractEvent(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI
+    },
+    "ClearTweets",
+    ([id]) => {
+      console.debug("ClearTweets", id.toNumber())
+    
+      setTweets(() => {
+        return new Map()
+      })
+    }
+  )
+
   return (
     <section>
-      <p>test</p>
       {Array.from(tweets, ([id, tweet]) => {
-        console.log("here")
         return (
           <Tweet
             id={id}

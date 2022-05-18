@@ -1,4 +1,4 @@
-import { useContractRead, useContractWrite } from "wagmi"
+import { useContractRead, useContractWrite, useEnsName } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Tweet(props) {
@@ -79,12 +79,29 @@ export default function Tweet(props) {
     }
   }
 
+  const getEnsName = (address) => {
+    try {
+      const { data, isSuccess } = useEnsName({
+        address: address
+      })
+
+      if (isSuccess) {
+        return data
+      } else {
+        const match = address.match(/^(0x.{4}).+(.{4})$/)
+        return (match[1] + "..." + match[2])
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <>
       <div>
         <button onClick={() => removeTweet(props.id)}>✕</button>
-        <div>From: {props.tweet.from}</div>
-        <div>Time: {props.tweet.timestamp.toString()}</div>
+        <div>From: {getEnsName(props.tweet.from)}</div>
+        <div>Time: {props.tweet.timestamp.toLocaleString("en-US", { timeStyle: "short", dateStyle: "short" })}</div>
         <div>Message: {props.tweet.message}</div>
       </div>
     </>

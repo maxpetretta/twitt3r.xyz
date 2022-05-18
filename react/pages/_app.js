@@ -9,7 +9,7 @@ import {
 import { chain, createClient, WagmiProvider } from "wagmi"
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.rinkeby, chain.hardhat],
+  [chain.hardhat, chain.mainnet, chain.rinkeby], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
   [apiProvider.infura(process.env.REACT_APP_INFURA_ID), apiProvider.fallback()]
 )
 const { connectors } = getDefaultWallets({
