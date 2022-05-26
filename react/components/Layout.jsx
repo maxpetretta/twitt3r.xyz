@@ -1,7 +1,13 @@
 import Head from "next/head"
+import Nav from "./Nav"
 import Header from "./Header"
+import Sidebar from "./Sidebar"
 import Footer from "./Footer"
 import { useRouter } from "next/router"
+import { useAccount, useContractRead } from "wagmi"
+
+import { useEffect, useState } from "react"
+import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Layout(props) {
   const { children, ...pageMeta } = props
@@ -14,6 +20,55 @@ export default function Layout(props) {
     type: "website",
     ...pageMeta,
   }
+
+  const { data: account } = useAccount()
+  const [isConnected, setIsConnected] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
+
+  /**
+   * Contract hooks
+   */
+  const { data: ownerData } = useContractRead(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "getOwner",
+    {
+      enabled: false,
+    }
+  )
+
+  /**
+   * Check for a previously connected wallet, and if it belongs to the contract owner
+   */
+  const checkConnectedWallet = async () => {
+    try {
+      if (account) {
+        setIsConnected(true)
+        console.log("Found an authorized account:", account.address)
+
+        // Check if this is the owner's wallet
+        if (ownerData.toUpperCase() === account.address.toUpperCase()) {
+          setIsOwner(true)
+        }
+      } else {
+        setIsConnected(false)
+        console.log("No authorized account found")
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  /**
+   * On page load, check for an existing wallet
+   */
+  useEffect(() => {
+    if (account) {
+      checkConnectedWallet()
+    }
+  }, [account])
 
   return (
     <>
@@ -41,11 +96,17 @@ export default function Layout(props) {
         <meta name="twitter:description" content={meta.description} />
         <meta name="twitter:image" content={meta.image} />
       </Head>
-      <Header />
-        <main>
-          {children}
-        </main>
-      <Footer />
+      <div className="bg-white text-black max-w-6xl mx-auto min-h-screen">
+        {/* <Header /> */}
+        <div className="flex flex-row">
+          <Nav isConnected={isConnected} />
+          <main className="w-1/2" isConnected={isConnected}>
+            {children}
+          </main>
+          <Sidebar isConnected={isConnected} isOwner={isOwner} />
+        </div>
+        {/* <Footer /> */}
+      </div>
     </>
   )
 }

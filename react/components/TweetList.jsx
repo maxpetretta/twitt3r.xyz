@@ -85,7 +85,7 @@ export default function TweetList() {
             tweet={tweet}
           />
         )
-      })}
+      }).reverse()}
     </section>
   )
 }

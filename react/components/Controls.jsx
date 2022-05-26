@@ -212,12 +212,12 @@ export default function Controls() {
   }, [account])
 
   return (
-    <section>
+    <section className="m-3 p-3 bg-gray-100 rounded-xl">
       <h3>Contract Settings</h3>
-      <p>Welcome, owner! You may modify the contract settings below:</p>
+      <p className="mt-1">Welcome, owner! You may modify the contract settings below:</p>
       <form onSubmit={updateContractSettings}>
-        <div>
-          <label>Tw33t Price:</label>
+        <div className="flex mt-3">
+          <label>Price:</label>
           <input
             id="price"
             type="number"
@@ -225,20 +225,26 @@ export default function Controls() {
             value={price}
             onChange={e => setPrice(e.target.value)}
             placeholder="Price in Ether"
+            className="w-full text-right bg-gray-100"
             required
           />
           <span>Ξ</span>
-          <label>Lottery Odds:</label>
+        </div>
+        <div className="flex mt-1">
+          <label>Odds:</label>
           <input
             id="odds"
             type="number"
             value={odds}
             onChange={e => setOdds(e.target.value)}
-            placeholder="0 - 100%"
+            placeholder="0 - 100"
+            className="w-full text-right bg-gray-100"
             required
           />
           <span>%</span>
-          <label>Lottery Jackpot:</label>
+        </div>
+        <div className="flex mt-1">
+          <label>Jackpot:</label>
           <input
             id="jackpot"
             type="number"
@@ -246,18 +252,19 @@ export default function Controls() {
             value={jackpot}
             onChange={e => setJackpot(e.target.value)}
             placeholder="Prize in Ether"
+            className="w-full text-right bg-gray-100"
             required
           />
           <span>Ξ</span>
         </div>
-        <div>
-          <button type="button" onClick={clearTweets}>
-            Clear All Tweets
-          </button>
-          <button type="button" onClick={pauseContract}>
+        <div className="flex flex-col mt-6">
+          <button className="button mx-6">Submit Changes</button>
+          <button className="button mx-6 mt-3" type="button" onClick={pauseContract}>
             Pause Contract
           </button>
-          <button>Submit Changes</button>
+          <button className="button mx-6 mt-3" type="button" onClick={clearTweets}>
+            Clear All Tw33ts
+          </button>
         </div>
       </form>
     </section>

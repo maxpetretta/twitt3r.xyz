@@ -3,15 +3,15 @@ import Head from "next/head"
 import { ThemeProvider } from "next-themes"
 import { chain, createClient, WagmiProvider } from "wagmi"
 import {
-  darkTheme,
+  // darkTheme,
   lightTheme,
   apiProvider,
   configureChains,
   getDefaultWallets,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit"
-import "@rainbow-me/rainbowkit/styles.css"
 import "../styles/globals.css"
+import "@rainbow-me/rainbowkit/styles.css"
 
 const { chains, provider } = configureChains(
   [chain.hardhat, chain.mainnet, chain.rinkeby], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
@@ -64,15 +64,17 @@ export default function App({ Component, pageProps }) {
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.google-analytics.com" />
       </Head>
-      <ThemeProvider attribute="class" defaultTheme="light">
+      <ThemeProvider attribute="class" forcedTheme="light">
         <WagmiProvider client={wagmiClient}>
           <RainbowKitProvider
-            coolMode
+            theme={lightTheme({
+              accentColor: "#e73e83",
+              accentColorForeground: "white",
+              borderRadius: "large",
+              fontStack: "system",
+            })}
             chains={chains}
-            theme={{
-              lightMode: lightTheme(),
-              darkMode: darkTheme(),
-            }}
+            coolMode
           >
             <Component {...pageProps} />
           </RainbowKitProvider>

@@ -2,14 +2,14 @@
 
 export default function Footer() {
   return (
-    <footer>
-      <p>
+    <footer className="flex flex-col items-center p-4">
+      <span className="block">
         Built by <a href="https://maxpetretta.com">Max Petretta</a>
-      </p>
-      <p>
+      </span>
+      <span className="block">
         Check out the source code on{" "}
         <a href="https://github.com/maxpetretta/twitt3r.xyz">GitHub</a>
-      </p>
+      </span>
     </footer>
   )
 }
