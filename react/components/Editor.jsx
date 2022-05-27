@@ -69,7 +69,7 @@ export default function Editor() {
   }
 
   return (
-    <section className="flex flex-col border">
+    <section className="flex flex-col border-b">
       <h2 className="mt-4 ml-3">Latest Tw33ts</h2>
       <div className="mt-2 flex items-center">
         <img src={avatar} className={ avatar ? "w-12 h-12 rounded-full inline mx-3" : "hidden" } />

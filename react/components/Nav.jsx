@@ -71,7 +71,7 @@ export default function Nav(props) {
   }
 
   return (
-    <nav className="flex flex-col w-1/4 h-screen border">
+    <nav className="flex flex-col w-1/4 h-screen">
       <Link href="/">
         <a className="transition duration-200 w-min ml-1 mt-1 p-3 rounded-full hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="" width="32" height="32" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="currentColor" strokeLinecap="round" strokeLinejoin="round">
@@ -92,7 +92,7 @@ export default function Nav(props) {
         </a>
       </Link>
       <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-2 p-2 hover:bg-gray-200">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <line x1="5" y1="9" x2="19" y2="9"></line>
@@ -104,7 +104,19 @@ export default function Nav(props) {
         </a>
       </Link>
       <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-2 p-2 hover:bg-gray-200">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
+          <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+          </svg>
+          <span>Communities</span>
+        </a>
+      </Link>
+      <Link href="">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"></path>
@@ -114,7 +126,7 @@ export default function Nav(props) {
         </a>
       </Link>
       <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-2 p-2 hover:bg-gray-200">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <rect x="3" y="5" width="18" height="14" rx="2"></rect>
@@ -124,7 +136,7 @@ export default function Nav(props) {
         </a>
       </Link>
       <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-2 p-2 hover:bg-gray-200">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <path d="M9 4h6a2 2 0 0 1 2 2v14l-5 -3l-5 3v-14a2 2 0 0 1 2 -2"></path>
@@ -132,8 +144,8 @@ export default function Nav(props) {
         <span>Bookmarks</span>
         </a>
       </Link>
-      <Link href="/profile">
-        <a className="no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-2 p-2 hover:bg-gray-200">
+      <Link href={"/" + (account ? account.address : "profile")}>
+        <a className="no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
         <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <circle cx="12" cy="7" r="4"></circle>
@@ -143,7 +155,7 @@ export default function Nav(props) {
         </a>
       </Link>
       <button className="button mt-6 place-self-center w-44 h-12" onClick={() => setModal(true)}>Tw33t</button>
-      <div className="flex flex-col items-center mt-12">
+      <div className="flex flex-col items-center mt-auto mb-12 text-center">
         <span>Built by <a href="https://maxpetretta.com">Max Petretta</a></span>
         <span>
           Check out the source code on{" "}
@@ -152,7 +164,7 @@ export default function Nav(props) {
       </div>
       {modal && <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-10" id="modal-overlay" />}
       {modal && (
-        <div className="absolute flex flex-col bg-white w-160 h-80 rounded-xl m-auto inset-x-0 top-0 bottom-1/3 z-20" id="tweet-modal">
+        <div className="absolute flex flex-col bg-white w-128 h-80 rounded-xl m-auto inset-x-0 top-0 bottom-1/3 z-20" id="tweet-modal">
           <button className="float-right transition duration-200 rounded-full m-2 p-2 w-fit h-fit hover:bg-gray-200" onClick={() => setModal(false)}>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
               <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -177,7 +189,7 @@ export default function Nav(props) {
               className="text-xl grow mr-4 outline-none resize-none"
             />
           </div>
-          <div className="flex justify-end items-center mt-auto">
+          <div className="flex justify-end items-center mt-auto border-t">
             <span className="text-gray-500 m-3 mt-1">{message ? message.length + "/280" : ""}</span>
             <button className="button self-end m-3 mt-1" onClick={sendTweet}>Tw33t</button>
           </div>

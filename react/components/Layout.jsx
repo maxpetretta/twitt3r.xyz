@@ -96,11 +96,11 @@ export default function Layout(props) {
         <meta name="twitter:description" content={meta.description} />
         <meta name="twitter:image" content={meta.image} />
       </Head>
-      <div className="bg-white text-black max-w-6xl mx-auto min-h-screen">
+      <div className="bg-white text-black max-w-7xl mx-auto min-h-screen">
         {/* <Header /> */}
         <div className="flex flex-row">
           <Nav isConnected={isConnected} />
-          <main className="w-1/2" isConnected={isConnected}>
+          <main className="w-1/2 border" isConnected={isConnected}>
             {children}
           </main>
           <Sidebar isConnected={isConnected} isOwner={isOwner} />

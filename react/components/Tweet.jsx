@@ -112,11 +112,11 @@ export default function Tweet(props) {
 
   return (
     <>
-      <div className="flex flex-row border pt-4 pb-2">
+      <div className="flex flex-row pt-4 pb-2 border-b">
         <img src={avatar} className={ avatar ? "w-12 h-12 rounded-full inline mx-3" : "hidden" } />
         <img src="/images/egg.png" className={ avatar ? "hidden" : "w-12 h-12 rounded-full inline mx-3" } />
         <div className="grow">
-          <Link href={"/profile/" + props.tweet.from}>
+          <Link href={"/" + props.tweet.from}>
             <a className="font-semibold text-black" title={props.tweet.from}>{getEnsName(props.tweet.from)}</a>
           </Link>
           <span className="ml-1" title={props.tweet.timestamp.toLocaleString("en-US", { timeStyle: "short", dateStyle: "long" })}>- {dayjs(props.tweet.timestamp).fromNow()}</span>
