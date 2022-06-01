@@ -1,8 +1,6 @@
 import Head from "next/head"
 import Nav from "./Nav"
-import Header from "./Header"
 import Sidebar from "./Sidebar"
-import Footer from "./Footer"
 import { useRouter } from "next/router"
 import { useAccount, useContractRead } from "wagmi"
 
@@ -97,15 +95,13 @@ export default function Layout(props) {
         <meta name="twitter:image" content={meta.image} />
       </Head>
       <div className="bg-white text-black max-w-7xl mx-auto min-h-screen">
-        {/* <Header /> */}
         <div className="flex flex-row">
           <Nav isConnected={isConnected} />
-          <main className="w-1/2 border" isConnected={isConnected}>
+          <main className="w-1/2 border">
             {children}
           </main>
           <Sidebar isConnected={isConnected} isOwner={isOwner} />
         </div>
-        {/* <Footer /> */}
       </div>
     </>
   )

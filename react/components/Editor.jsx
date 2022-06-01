@@ -1,10 +1,11 @@
+import { ethers } from "ethers"
 import { useState } from "react"
 import { useAccount, useContractRead, useContractWrite, useEnsAvatar } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Editor() {
   const [message, setMessage] = useState("")
-
+  const [price, setPrice] = useState(0)
   const { data: account } = useAccount()
   
   /**
@@ -13,7 +14,7 @@ export default function Editor() {
   const { data: avatar, isSuccess: avatarSuccess, refetch: avatarRefetch } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
-      console.log(error)
+      console.error(error)
     }
   })
 
@@ -22,7 +23,12 @@ export default function Editor() {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getPrice"
+    "getPrice",
+    {
+      onSuccess(data) {
+        setPrice(ethers.utils.formatEther(data))
+      }
+    }
   )
 
    const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
@@ -55,13 +61,11 @@ export default function Editor() {
   /**
    * Submit a new tweet to the contract
    */
-  const sendTweet = async () => {
+  const sendTweet = () => {
     try {
-      priceRefetch().then((value) => {
-        newTweet({
-          args: message.toString(),
-          overrides: { value: value.data }
-        })
+      newTweet({
+        args: message.toString(),
+        overrides: { value: ethers.utils.parseEther(price) }
       })
     } catch (error) {
       console.error(error)
@@ -72,8 +76,8 @@ export default function Editor() {
     <section className="flex flex-col border-b">
       <h2 className="mt-4 ml-3">Latest Tw33ts</h2>
       <div className="mt-2 flex items-center">
-        <img src={avatar} className={ avatar ? "w-12 h-12 rounded-full inline mx-3" : "hidden" } />
-        <img src="/images/egg.png" className={ avatar ? "hidden" : "w-12 h-12 rounded-full inline mx-3" } />
+        <img src="/images/egg.png" className="w-12 h-12 rounded-full inline mx-3" />
+        {avatar && <img src={avatar} className="absolute top-0 left-0 w-12 h-12 rounded-full inline mx-3 z-10" onLoad={() => setLoaded(true)} />}
         <textarea
           type="text"
           rows="1"
@@ -88,9 +92,12 @@ export default function Editor() {
           className="text-xl grow mr-4 outline-none resize-none"
         />
       </div>
-      <div className="flex justify-end items-center">
-        <span className="text-gray-500 m-3 mt-1">{message ? message.length + "/280" : ""}</span>
-        <button className="button self-end m-3 mt-1" onClick={sendTweet}>Tw33t</button>
+      <div className="flex justify-between items-center ml-3">
+        <span className="text-gray-500 text-sm mb-3">Price: {price}Ξ</span>
+        <div>
+          <span className="text-gray-500">{message ? message.length + "/280" : ""}</span>
+          <button className="button self-end mx-3 mb-3" onClick={sendTweet}>Tw33t</button>
+        </div>
       </div>
     </section>
   )

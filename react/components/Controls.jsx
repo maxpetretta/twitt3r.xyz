@@ -1,5 +1,5 @@
 import { ethers } from "ethers"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useAccount, useContractRead, useContractWrite } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract"
 
@@ -7,8 +7,6 @@ export default function Controls() {
   const [price, setPrice] = useState(0)
   const [odds, setOdds] = useState(0)
   const [jackpot, setJackpot] = useState(0)
-
-  const { data: account } = useAccount()
 
   /**
    * Contract hooks
@@ -18,7 +16,12 @@ export default function Controls() {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getPrice"
+    "getPrice",
+    {
+      onSuccess(data) {
+        setPrice(ethers.utils.formatEther(data))
+      }
+    }
   )
 
   const { data: oddsData, error: oddsError, refetch: oddsRefetch } = useContractRead(
@@ -26,7 +29,12 @@ export default function Controls() {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getOdds"
+    "getOdds",
+    {
+      onSuccess(data) {
+        setOdds(ethers.utils.formatUnits(data, 0))
+      }
+    }
   )
 
   const { data: jackpotData, error: jackpotError, refetch: jackpotRefetch } = useContractRead(
@@ -34,7 +42,12 @@ export default function Controls() {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getJackpot"
+    "getJackpot",
+    {
+      onSuccess(data) {
+        setJackpot(ethers.utils.formatEther(data))
+      }
+    }
   )
 
   const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
@@ -129,25 +142,6 @@ export default function Controls() {
   )
 
   /**
-   * Read the settings values from the contract, and set them in state
-   */
-  const getSettings = async () => {
-    try {
-      priceRefetch().then((value) => {
-        setPrice(ethers.utils.formatEther(value.data))
-      })
-      oddsRefetch().then((value) => {
-        setOdds(ethers.utils.formatUnits(value.data, 0))
-      })
-      jackpotRefetch().then((value) => {
-        setJackpot(ethers.utils.formatEther(value.data))
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  /**
    * Update the setting parameters (price, odds, jackpot) , only for the owner
    * @param {*} event - POST event from the form
    */
@@ -194,22 +188,6 @@ export default function Controls() {
       console.error(error)
     }
   }
-
-  /**
-   * On page load, get the current contract settings
-   */
-  useEffect(() => {
-    if (account) {
-      getSettings()
-    }
-
-    // Cleanup function for settings
-    return () => {
-      setPrice(price)
-      setOdds(odds)
-      setJackpot(jackpot)
-    }
-  }, [account])
 
   return (
     <section className="m-3 p-3 bg-gray-100 rounded-xl">

@@ -1,4 +1,5 @@
 import Head from "next/head"
+import { AppProvider } from "../components/AppProvider"
 // import Script from "next/script"
 import { ThemeProvider } from "next-themes"
 import { chain, createClient, WagmiProvider } from "wagmi"
@@ -60,9 +61,9 @@ export default function App({ Component, pageProps }) {
         <meta name="msapplication-TileColor" content="#c73156" />
         <meta name="theme-color" content="#111827" />
         {/* Preconnects */}
-        <link rel="preconnect" href="https://vitals.vercel-insights.com" />
+        {/* <link rel="preconnect" href="https://vitals.vercel-insights.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" /> */}
       </Head>
       <ThemeProvider attribute="class" forcedTheme="light">
         <WagmiProvider client={wagmiClient}>
@@ -76,7 +77,9 @@ export default function App({ Component, pageProps }) {
             chains={chains}
             coolMode
           >
-            <Component {...pageProps} />
+            <AppProvider>
+              <Component {...pageProps} />
+            </AppProvider>
           </RainbowKitProvider>
         </WagmiProvider>
       </ThemeProvider>

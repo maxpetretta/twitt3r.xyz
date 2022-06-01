@@ -1,13 +1,20 @@
 import Link from "next/link"
+import { ethers } from "ethers"
 import { useState } from "react"
 import { useAccount, useContractRead, useContractWrite, useEnsAvatar } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Nav(props) {
+  const [price, setPrice] = useState(0)
   const [modal, setModal] = useState(false)
+  const [address, setAddress] = useState("")
   const [message, setMessage] = useState("")
 
-  const { data: account } = useAccount()
+  const { data: account, isSuccess: accountSuccess, refetch: accountRefetch } = useAccount({
+    onSuccess(data) {
+      setAddress(data.address)
+    }
+  })
   
   /**
    * Contract hooks
@@ -15,7 +22,7 @@ export default function Nav(props) {
   const { data: avatar, isSuccess: avatarSuccess, refetch: avatarRefetch } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
-      console.log(error)
+      console.error(error)
     }
   })
 
@@ -24,7 +31,12 @@ export default function Nav(props) {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getPrice"
+    "getPrice",
+    {
+      onSuccess(data) {
+        setPrice(ethers.utils.formatEther(data))
+      }
+    }
   )
 
    const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
@@ -57,13 +69,11 @@ export default function Nav(props) {
   /**
    * Submit a new tweet to the contract
    */
-   const sendTweet = async () => {
+   const sendTweet = () => {
     try {
-      priceRefetch().then((value) => {
-        newTweet({
-          args: message.toString(),
-          overrides: { value: value.data }
-        })
+      newTweet({
+        args: message.toString(),
+        overrides: { value: ethers.utils.parseEther(price) }
       })
     } catch (error) {
       console.error(error)
@@ -91,8 +101,8 @@ export default function Nav(props) {
           <span>Home</span>
         </a>
       </Link>
-      <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
+      <Link href="/">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 text-gray-400 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <line x1="5" y1="9" x2="19" y2="9"></line>
@@ -103,8 +113,8 @@ export default function Nav(props) {
           <span>Explore</span>
         </a>
       </Link>
-      <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
+      <Link href="/">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 text-gray-400 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <circle cx="9" cy="7" r="4"></circle>
@@ -115,8 +125,8 @@ export default function Nav(props) {
           <span>Communities</span>
         </a>
       </Link>
-      <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
+      <Link href="/">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 text-gray-400 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"></path>
@@ -125,8 +135,8 @@ export default function Nav(props) {
           <span>Notifications</span>
         </a>
       </Link>
-      <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
+      <Link href="/">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 text-gray-400 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <rect x="3" y="5" width="18" height="14" rx="2"></rect>
@@ -135,8 +145,8 @@ export default function Nav(props) {
           <span>Messages</span>
         </a>
       </Link>
-      <Link href="">
-        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
+      <Link href="/">
+        <a className="cursor-not-allowed no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 text-gray-400 hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <path d="M9 4h6a2 2 0 0 1 2 2v14l-5 -3l-5 3v-14a2 2 0 0 1 2 -2"></path>
@@ -144,7 +154,7 @@ export default function Nav(props) {
         <span>Bookmarks</span>
         </a>
       </Link>
-      <Link href={"/" + (account ? account.address : "profile")}>
+      <Link href={`/${address}`}>
         <a className="no-link transition duration-200 flex items-center rounded-full text-xl font-medium mt-4 p-2 hover:bg-gray-200">
         <svg xmlns="http://www.w3.org/2000/svg" className="inline ml-2 mr-4" width="28" height="28" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -189,9 +199,12 @@ export default function Nav(props) {
               className="text-xl grow mr-4 outline-none resize-none"
             />
           </div>
-          <div className="flex justify-end items-center mt-auto border-t">
-            <span className="text-gray-500 m-3 mt-1">{message ? message.length + "/280" : ""}</span>
-            <button className="button self-end m-3 mt-1" onClick={sendTweet}>Tw33t</button>
+          <div className="flex justify-between items-center mt-auto border-t">
+            <span className="text-gray-500 text-sm m-3">Price: {price}Ξ</span>
+            <div>
+              <span className="text-gray-500">{message ? message.length + "/280" : ""}</span>
+              <button className="button self-end m-3" onClick={sendTweet}>Tw33t</button>
+            </div>
           </div>
         </div>
       )}

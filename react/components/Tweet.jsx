@@ -15,7 +15,7 @@ export default function Tweet(props) {
   const { data: avatar, isSuccess: avatarSuccess, refetch: avatarRefetch } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
-      console.log(error)
+      console.error(error)
     }
   })
 
@@ -93,6 +93,9 @@ export default function Tweet(props) {
     }
   }
 
+  /**
+   * Get the ENS username of the given address
+   */
   const getEnsName = (address) => {
     try {
       const { data, isSuccess } = useEnsName({
@@ -116,7 +119,7 @@ export default function Tweet(props) {
         <img src={avatar} className={ avatar ? "w-12 h-12 rounded-full inline mx-3" : "hidden" } />
         <img src="/images/egg.png" className={ avatar ? "hidden" : "w-12 h-12 rounded-full inline mx-3" } />
         <div className="grow">
-          <Link href={"/" + props.tweet.from}>
+          <Link href={`/${props.tweet.from}`}>
             <a className="font-semibold text-black" title={props.tweet.from}>{getEnsName(props.tweet.from)}</a>
           </Link>
           <span className="ml-1" title={props.tweet.timestamp.toLocaleString("en-US", { timeStyle: "short", dateStyle: "long" })}>- {dayjs(props.tweet.timestamp).fromNow()}</span>

@@ -1,10 +1,33 @@
 import Head from "next/head"
 import Link from "next/link"
 import Layout from "../components/Layout"
+import { useState, useEffect } from "react"
 import { useAccount } from "wagmi"
 
 export default function Error404() {
-  const { data: account } = useAccount()
+  const [address, setAddress] = useState("")
+  const { refetch: accountRefetch } = useAccount()
+
+  /**
+   * Get the address of the connected account
+   */
+  const getAddress = () => {
+    try {
+      accountRefetch().then((value) => {
+        console.log(value)
+        setAddress(value.data.address)
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  /**
+   * On page load
+   */
+  useEffect(() => {
+    getAddress()
+  })
 
   return (
     <>
@@ -23,7 +46,7 @@ export default function Error404() {
               <a>returning home</a>
             </Link>{" "}
             or check out your{" "}
-            <Link href={"/" + (account ? account.address : "")}>
+            <Link href={`/${address}`}>
               <a>Twitt3r profile</a>
             </Link>
             .
