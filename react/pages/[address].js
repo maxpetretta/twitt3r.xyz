@@ -60,9 +60,9 @@ export default function Profile() {
   return (
     <>
       <Layout>
-        <section className="px-4 pt-4 border-b">
+        <section className="border-b px-4 pt-4">
           <Link href="/">
-            <a className="no-link transition duration-200 rounded-full hover:bg-gray-200">
+            <a className="no-link rounded-full transition duration-200 hover:bg-gray-200">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -81,20 +81,20 @@ export default function Profile() {
               </svg>
             </a>
           </Link>
-          <div className="bg-twitter-blue w-full h-48 mt-4" />
+          <div className="mt-4 h-48 w-full bg-twitter-blue" />
           <div className="relative -top-16">
             <img
               src="/images/egg.png"
-              className="w-32 h-32 rounded-full border-4 border-white ml-4"
+              className="ml-4 h-32 w-32 rounded-full border-4 border-white"
             />
             {avatarSuccess && (
               <img
                 src={avatar}
-                className="absolute top-0 left-0 w-32 h-32 rounded-full inline z-10 border-4 border-white ml-4"
+                className="absolute top-0 left-0 z-10 ml-4 inline h-32 w-32 rounded-full border-4 border-white"
               />
             )}
             <a href={`https://etherscan.io/address/${address}`}>
-              <h1 className="text-black text-xl mt-4">{ens}</h1>
+              <h1 className="mt-4 text-xl text-black">{ens}</h1>
             </a>
             {name && (
               <h2 className="text-sm font-normal text-gray-600">{address}</h2>

@@ -9,7 +9,9 @@ export default function TweetList(props) {
    */
   const getFilteredTweets = () => {
     if (props.filter) {
-      const filtered = [...tweets.entries()].filter((tweet) => tweet[1].from == props.filter)
+      const filtered = [...tweets.entries()].filter(
+        (tweet) => tweet[1].from == props.filter
+      )
       return filtered
     } else {
       return tweets
@@ -19,13 +21,7 @@ export default function TweetList(props) {
   return (
     <section>
       {Array.from(getFilteredTweets(), ([id, tweet]) => {
-        return (
-          <Tweet
-            id={id}
-            key={id}
-            tweet={tweet}
-          />
-        )
+        return <Tweet id={id} key={id} tweet={tweet} />
       }).reverse()}
     </section>
   )

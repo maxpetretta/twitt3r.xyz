@@ -25,7 +25,7 @@
 
 @layer components {
   .button {
-    @apply transform transition duration-200 cursor-pointer rounded-full px-5 py-2 bg-twitter-blue text-white font-bold hover:scale-105 focus:scale-105;
+    @apply transform cursor-pointer rounded-full bg-twitter-blue px-5 py-2 font-bold text-white transition duration-200 hover:scale-105 focus:scale-105;
   }
   .no-link {
     @apply text-black hover:no-underline;

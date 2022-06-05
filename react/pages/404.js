@@ -24,7 +24,7 @@ export default function Error404() {
         <meta name="description" content="That page cannot be found!" />
       </Head>
       <Layout>
-        <section className="p-4 border-b">
+        <section className="border-b p-4">
           <h1>Error 404: Rugged!</h1>
           <h3 className="mt-4">Looks like that page does not exist</h3>
           <p className="mt-4">

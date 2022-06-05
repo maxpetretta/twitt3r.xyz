@@ -25,7 +25,7 @@ export default function Layout(props) {
     onSuccess(data) {
       if (data) {
         console.debug("Found authorized account: ", data.address)
-  
+
         // Check if this is the owner's wallet
         if (ownerData.toUpperCase() === account.address.toUpperCase()) {
           setIsOwner(true)
@@ -35,7 +35,7 @@ export default function Layout(props) {
       } else {
         console.debug("No authorized account found")
       }
-    }
+    },
   })
 
   /**
@@ -56,10 +56,7 @@ export default function Layout(props) {
         <title>{meta.title}</title>
         <meta name="robots" content="follow, index" />
         <meta name="description" content={meta.description} />
-        <link
-          rel="canonical"
-          href={`https://twitt3r.xyz${router.asPath}`}
-        />
+        <link rel="canonical" href={`https://twitt3r.xyz${router.asPath}`} />
         <meta
           property="og:url"
           content={`https://twitt3r.xyz${router.asPath}`}
@@ -75,13 +72,11 @@ export default function Layout(props) {
         <meta name="twitter:description" content={meta.description} />
         <meta name="twitter:image" content={meta.image} />
       </Head>
-      <div className="bg-white text-black max-w-7xl mx-auto min-h-screen">
+      <div className="mx-auto min-h-screen max-w-7xl bg-white text-black">
         <div className="flex flex-row">
           <Toaster position="top-right" />
           <Nav />
-          <main className="w-1/2 border">
-            {children}
-          </main>
+          <main className="w-1/2 border">{children}</main>
           <Sidebar isOwner={isOwner} />
         </div>
       </div>
