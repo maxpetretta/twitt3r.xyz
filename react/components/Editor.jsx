@@ -1,12 +1,14 @@
 import { ethers } from "ethers"
 import { useState } from "react"
-import { useAccount, useContractRead, useContractWrite, useEnsAvatar } from "wagmi"
+import { useAccount, useContractRead, useContractWrite, useEnsAvatar, useSigner } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Editor() {
   const [message, setMessage] = useState("")
   const [price, setPrice] = useState(0)
   const { data: account } = useAccount()
+
+  const { data: signer } = useSigner()
   
   /**
    * Contract hooks
@@ -61,12 +63,35 @@ export default function Editor() {
   /**
    * Submit a new tweet to the contract
    */
-  const sendTweet = () => {
+  // const sendTweet = () => {
+  //   try {
+  //     newTweet({
+  //       args: message.toString(),
+  //       overrides: { value: ethers.utils.parseEther(price) }
+  //     })
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
+
+  const sendTweet = async () => {
     try {
-      newTweet({
-        args: message.toString(),
-        overrides: { value: ethers.utils.parseEther(price) }
+      console.log(signer)
+      const contract = new ethers.Contract(contractAddress, contractABI, signer)
+
+      let count = await contract.getTotalTweets()
+      console.debug("Retrieved total tweet count...", count.toNumber())
+
+      const txn = await contract.newTweet(message, {
+        value: ethers.utils.parseEther(price)
       })
+      console.debug("Mining...", txn.hash)
+
+      await txn.wait()
+      console.debug("Mined -- ", txn.hash)
+
+      count = await contract.getTotalTweets()
+      console.debug("Retrieved total tweet count...", count.toNumber())
     } catch (error) {
       console.error(error)
     }

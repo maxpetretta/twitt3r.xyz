@@ -1,5 +1,5 @@
-import { useState, useContext, createContext } from "react"
-import { useContractEvent } from "wagmi"
+import { useState, useEffect, useContext, createContext } from "react"
+import { useContractRead, useContractEvent } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 const AppContext = createContext()
@@ -10,6 +10,27 @@ export const AppProvider = ({ children }) => {
   /**
    * Contract hooks
    */
+  useContractRead(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "getTweets",
+    {
+      onSuccess(data) {
+        if (data) {
+          setTweets((prevState) => {
+            let newState = new Map(prevState)
+            data.forEach((tweet, id) => {
+              newState.set(id, {from: tweet[0], timestamp: new Date(tweet[1] * 1000), message: tweet[2]})
+            })
+            return newState
+          })
+        }
+      }
+    }
+  )
+
   useContractEvent(
     {
       addressOrName: contractAddress,
@@ -24,7 +45,10 @@ export const AppProvider = ({ children }) => {
         newState.set(id.toNumber(), {from: from, timestamp: new Date(timestamp * 1000), message: message})
         return newState
       })
-    }
+    },
+    {
+      once: false,
+    },
   )
 
   useContractEvent(
@@ -41,7 +65,10 @@ export const AppProvider = ({ children }) => {
         newState.set(id.toNumber(), {from: from, timestamp: new Date(timestamp * 1000), message: message})
         return newState
       })
-    }
+    },
+    {
+      once: false,
+    },
   )
 
   useContractEvent(
@@ -58,7 +85,10 @@ export const AppProvider = ({ children }) => {
         newState.delete(id.toNumber())
         return newState
       })
-    }
+    },
+    {
+      once: false,
+    },
   )
 
   useContractEvent(
@@ -75,7 +105,7 @@ export const AppProvider = ({ children }) => {
       })
     }
   )
-  
+
   return (
     <AppContext.Provider value={{ tweets, setTweets }}>
       {children}

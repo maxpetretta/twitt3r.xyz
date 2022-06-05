@@ -1,10 +1,11 @@
 import Head from "next/head"
 import Nav from "./Nav"
 import Sidebar from "./Sidebar"
+import { useState } from "react"
 import { useRouter } from "next/router"
+import toast, { Toaster } from "react-hot-toast"
 import { useAccount, useContractRead } from "wagmi"
 
-import { useEffect, useState } from "react"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Layout(props) {
@@ -19,9 +20,23 @@ export default function Layout(props) {
     ...pageMeta,
   }
 
-  const { data: account } = useAccount()
-  const [isConnected, setIsConnected] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
+  const { data: account } = useAccount({
+    onSuccess(data) {
+      if (data) {
+        console.debug("Found authorized account: ", data.address)
+  
+        // Check if this is the owner's wallet
+        if (ownerData.toUpperCase() === account.address.toUpperCase()) {
+          setIsOwner(true)
+        } else {
+          setIsOwner(false)
+        }
+      } else {
+        console.debug("No authorized account found")
+      }
+    }
+  })
 
   /**
    * Contract hooks
@@ -31,42 +46,8 @@ export default function Layout(props) {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getOwner",
-    {
-      enabled: false,
-    }
+    "getOwner"
   )
-
-  /**
-   * Check for a previously connected wallet, and if it belongs to the contract owner
-   */
-  const checkConnectedWallet = async () => {
-    try {
-      if (account) {
-        setIsConnected(true)
-        console.log("Found an authorized account:", account.address)
-
-        // Check if this is the owner's wallet
-        if (ownerData.toUpperCase() === account.address.toUpperCase()) {
-          setIsOwner(true)
-        }
-      } else {
-        setIsConnected(false)
-        console.log("No authorized account found")
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  /**
-   * On page load, check for an existing wallet
-   */
-  useEffect(() => {
-    if (account) {
-      checkConnectedWallet()
-    }
-  }, [account])
 
   return (
     <>
@@ -96,11 +77,12 @@ export default function Layout(props) {
       </Head>
       <div className="bg-white text-black max-w-7xl mx-auto min-h-screen">
         <div className="flex flex-row">
-          <Nav isConnected={isConnected} />
+          <Toaster position="top-right" />
+          <Nav />
           <main className="w-1/2 border">
             {children}
           </main>
-          <Sidebar isConnected={isConnected} isOwner={isOwner} />
+          <Sidebar isOwner={isOwner} />
         </div>
       </div>
     </>

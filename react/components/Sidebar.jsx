@@ -24,13 +24,13 @@ export default function Sidebar(props) {
           delete, and like tw33ts!
         </p>
       </div>
-      {props.isConnected && !props.isOwner && (
+      {!props.isOwner && (
         <div className="m-3 p-3 bg-gray-100 rounded-xl">
           <h3>Contract Settings</h3>
           <p className="mt-1">Connect as the owner wallet to modify contract settings...</p>
         </div>
       )}
-      {props.isConnected && props.isOwner && <Controls />}
+      {props.isOwner && <Controls />}
       <div className="flex flex-col items-center mt-auto mb-12 text-center">
         <span>Disclaimer: Not actually associated with <a href="https://twitter.com">Twitter, Inc.</a> in any way</span>
       </div>

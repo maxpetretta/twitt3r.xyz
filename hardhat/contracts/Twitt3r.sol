@@ -48,7 +48,7 @@ contract Twitt3r is Ownable, Pausable {
   function newTweet(string memory _message) public payable whenNotPaused {
     require(msg.value >= price, "Amount sent is incorrect");
     require(bytes(_message).length <= 280, "Limit is 280 characters!");
-    require(lastTweetedAt[msg.sender] + 5 minutes < block.timestamp, "Please wait 5 minutes before tweeting again!");
+    require(lastTweetedAt[msg.sender] + 1 minutes < block.timestamp, "Please wait a minute before tweeting again!");
     lastTweetedAt[msg.sender] = block.timestamp;
 
     console.log("%s has tweeted!", msg.sender); // DEBUG

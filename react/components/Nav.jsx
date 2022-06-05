@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { ethers } from "ethers"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAccount, useContractRead, useContractWrite, useEnsAvatar } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
@@ -12,7 +12,9 @@ export default function Nav(props) {
 
   const { data: account, isSuccess: accountSuccess, refetch: accountRefetch } = useAccount({
     onSuccess(data) {
-      setAddress(data.address)
+      if (data) {
+        setAddress(data.address)
+      }
     }
   })
   
@@ -79,6 +81,13 @@ export default function Nav(props) {
       console.error(error)
     }
   }
+
+  /*
+   * On page load, get all existing tweets
+   */
+  useEffect(() => {
+    accountRefetch()
+  })
 
   return (
     <nav className="flex flex-col w-1/4 h-screen">

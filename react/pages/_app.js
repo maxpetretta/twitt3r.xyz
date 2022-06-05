@@ -2,12 +2,12 @@ import Head from "next/head"
 import { AppProvider } from "../components/AppProvider"
 // import Script from "next/script"
 import { ThemeProvider } from "next-themes"
-import { chain, createClient, WagmiProvider } from "wagmi"
+import { chain, createClient, configureChains, WagmiConfig } from "wagmi"
+import { infuraProvider } from "wagmi/providers/infura"
+import { publicProvider } from "wagmi/providers/public"
 import {
   // darkTheme,
   lightTheme,
-  apiProvider,
-  configureChains,
   getDefaultWallets,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit"
@@ -15,8 +15,11 @@ import "../styles/globals.css"
 import "@rainbow-me/rainbowkit/styles.css"
 
 const { chains, provider } = configureChains(
-  [chain.hardhat, chain.mainnet, chain.rinkeby], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
-  [apiProvider.infura(process.env.REACT_APP_INFURA_ID), apiProvider.fallback()]
+  [chain.hardhat, chain.rinkeby, chain.mainnet], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
+  [
+    infuraProvider({ infuraId: process.env.REACT_APP_INFURA_ID }),
+    publicProvider(),
+  ]
 )
 
 const { connectors } = getDefaultWallets({
@@ -66,7 +69,7 @@ export default function App({ Component, pageProps }) {
         <link rel="preconnect" href="https://www.google-analytics.com" /> */}
       </Head>
       <ThemeProvider attribute="class" forcedTheme="light">
-        <WagmiProvider client={wagmiClient}>
+        <WagmiConfig client={wagmiClient}>
           <RainbowKitProvider
             theme={lightTheme({
               accentColor: "#e73e83",
@@ -81,7 +84,7 @@ export default function App({ Component, pageProps }) {
               <Component {...pageProps} />
             </AppProvider>
           </RainbowKitProvider>
-        </WagmiProvider>
+        </WagmiConfig>
       </ThemeProvider>
       {/* <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
