@@ -1,6 +1,6 @@
 import Link from "next/link"
 import dayjs from "dayjs"
-import { useAccount, useContractRead, useContractWrite, useEnsName, useEnsAvatar } from "wagmi"
+import { useAccount, useContractRead, useContractWrite, useEnsName, useEnsAvatar, UserRejectedRequestError } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 import toast from "react-hot-toast"
 

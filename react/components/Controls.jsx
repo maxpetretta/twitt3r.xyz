@@ -1,7 +1,7 @@
 import toast from "react-hot-toast"
 import { ethers } from "ethers"
 import { useState } from "react"
-import { useContractRead, useContractWrite } from "wagmi"
+import { useContractRead, useContractWrite, UserRejectedRequestError } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract"
 
 export default function Controls() {
@@ -123,13 +123,9 @@ export default function Controls() {
     },
     "pause",
     {
-      onSuccess(data) {
-        let status
-        isPausedRefetch().then((value) => {
-          status = value.data ? "Unpaused" : "Paused"
-          toast.success(status, " contract")
-          console.debug(status, "--", data.hash)
-        })
+      onSuccess(data) {  
+        toast.success("Paused contract")
+        console.debug("Paused --", data.hash)
       },
       onError(error) {
         if (error instanceof UserRejectedRequestError) {
@@ -150,13 +146,9 @@ export default function Controls() {
     },
     "unpause",
     {
-      onSuccess(data) {
-        let status
-        isPausedRefetch().then((value) => {
-          status = value.data ? "Unpaused" : "Paused"
-          toast.success(status, " contract")
-          console.debug(status, "--", data.hash)
-        })
+      onSuccess(data) {  
+        toast.success("Unpaused contract")
+        console.debug("Unpaused --", data.hash)
       },
       onError(error) {
         if (error instanceof UserRejectedRequestError) {
@@ -208,8 +200,6 @@ export default function Controls() {
    */
   const pauseContract = () => {
     try {
-      console.debug("Checked contract status, pause =", isPausedData.toString())
-
       if (isPausedData) {
         unpause()
       } else {

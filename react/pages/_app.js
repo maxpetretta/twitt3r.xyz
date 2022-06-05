@@ -10,6 +10,8 @@ import {
   lightTheme,
   getDefaultWallets,
   RainbowKitProvider,
+  connectorsForWallets,
+  wallet,
 } from "@rainbow-me/rainbowkit"
 import "../styles/globals.css"
 import "@rainbow-me/rainbowkit/styles.css"
@@ -22,10 +24,22 @@ const { chains, provider } = configureChains(
   ]
 )
 
-const { connectors } = getDefaultWallets({
+const { wallets } = getDefaultWallets({
   appName: "Twitt3r.xyz",
   chains,
 })
+
+const connectors = connectorsForWallets([
+  ...wallets,
+  {
+    groupName: "More",
+    wallets: [
+      wallet.argent({ chains }),
+      wallet.trust({ chains }),
+      wallet.ledger({ chains }),
+    ],
+  },
+])
 
 const wagmiClient = createClient({
   autoConnect: true,

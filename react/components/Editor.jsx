@@ -1,8 +1,7 @@
 import { ethers } from "ethers"
 import { useState } from "react"
 import toast from "react-hot-toast"
-import { UserRejectedRequestError } from "wagmi"
-import { useAccount, useContractRead, useContractWrite, useEnsAvatar, useSigner } from "wagmi"
+import { useAccount, useContractRead, useContractWrite, useEnsAvatar, useSigner, UserRejectedRequestError } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Editor() {

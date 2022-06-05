@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
-import { useAccount, useContractRead, useContractWrite, useEnsAvatar } from "wagmi"
+import { useAccount, useContractRead, useContractWrite, useEnsAvatar, UserRejectedRequestError } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 import toast from "react-hot-toast"
 
@@ -98,7 +98,7 @@ export default function Nav(props) {
   })
 
   return (
-    <nav className="flex flex-col w-1/4">
+    <nav className="flex flex-col w-1/4 min-h-screen">
       <Link href="/">
         <a className="transition duration-200 w-min ml-1 mt-1 p-3 rounded-full hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="" width="32" height="32" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="currentColor" strokeLinecap="round" strokeLinejoin="round">

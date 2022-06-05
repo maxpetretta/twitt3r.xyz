@@ -4,7 +4,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 
 export default function Sidebar(props) {
   return (
-    <section className="flex flex-col w-1/4">
+    <aside className="flex flex-col w-1/4 min-h-screen">
       <div className="self-center mt-3">
         <ConnectButton chainStatus="none" showBalance={true} />
       </div>
@@ -34,6 +34,6 @@ export default function Sidebar(props) {
       <div className="flex flex-col items-center mt-auto mb-12 text-center">
         <span>Disclaimer: Not actually associated with <a href="https://twitter.com">Twitter, Inc.</a> in any way</span>
       </div>
-    </section>
+    </aside>
   )
 }
