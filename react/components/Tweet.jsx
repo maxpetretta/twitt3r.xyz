@@ -2,6 +2,7 @@ import Link from "next/link"
 import dayjs from "dayjs"
 import { useAccount, useContractRead, useContractWrite, useEnsName, useEnsAvatar } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
+import toast from "react-hot-toast"
 
 export default function Tweet(props) {
   var relativeTime = require('dayjs/plugin/relativeTime')
@@ -15,7 +16,7 @@ export default function Tweet(props) {
   const { data: avatar, isSuccess: avatarSuccess, refetch: avatarRefetch } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
-      console.error(error)
+      console.error("Error fetching ENS", error)
     }
   })
 
@@ -36,12 +37,19 @@ export default function Tweet(props) {
     {
       onSuccess(data) {
         totalTweetsRefetch().then((value) => {
+          toast.success("Edited tweet!")
           console.debug("Edited --", data.hash)
           console.debug("Retrieved total tweet count --", value.data.toNumber())
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -55,12 +63,19 @@ export default function Tweet(props) {
     {
       onSuccess(data) {
         totalTweetsRefetch().then((value) => {
+          toast.success("Deleted tweet!")
           console.debug("Deleted --", data.hash)
           console.debug("Retrieved total tweet count --", value.data.toNumber())
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -75,7 +90,8 @@ export default function Tweet(props) {
         args: [id, message]
       })
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction failed")
+      console.error("Transaction failed --", error)
     }
   }
 
@@ -89,7 +105,8 @@ export default function Tweet(props) {
         args: [id]
       })
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction failed")
+      console.error("Transaction failed --", error)
     }
   }
 
@@ -109,7 +126,7 @@ export default function Tweet(props) {
         return (match[1] + "..." + match[2])
       }
     } catch (error) {
-      console.error(error)
+      console.error("Error fetching ENS", error)
     }
   }
 

@@ -3,6 +3,7 @@ import { ethers } from "ethers"
 import { useState, useEffect } from "react"
 import { useAccount, useContractRead, useContractWrite, useEnsAvatar } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
+import toast from "react-hot-toast"
 
 export default function Nav(props) {
   const [price, setPrice] = useState(0)
@@ -58,12 +59,19 @@ export default function Nav(props) {
     {
       onSuccess(data) {
         totalTweetsRefetch().then((value) => {
+          toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
           console.debug("Retrieved total tweet count --", value.data.toNumber())
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -90,7 +98,7 @@ export default function Nav(props) {
   })
 
   return (
-    <nav className="flex flex-col w-1/4 h-screen">
+    <nav className="flex flex-col w-1/4">
       <Link href="/">
         <a className="transition duration-200 w-min ml-1 mt-1 p-3 rounded-full hover:bg-gray-200">
           <svg xmlns="http://www.w3.org/2000/svg" className="" width="32" height="32" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="currentColor" strokeLinecap="round" strokeLinejoin="round">

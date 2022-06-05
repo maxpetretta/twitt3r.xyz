@@ -1,5 +1,7 @@
 import { ethers } from "ethers"
 import { useState } from "react"
+import toast from "react-hot-toast"
+import { UserRejectedRequestError } from "wagmi"
 import { useAccount, useContractRead, useContractWrite, useEnsAvatar, useSigner } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 
@@ -16,7 +18,7 @@ export default function Editor() {
   const { data: avatar, isSuccess: avatarSuccess, refetch: avatarRefetch } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
-      console.error(error)
+      console.error("Error fetching ENS", error)
     }
   })
 
@@ -50,12 +52,19 @@ export default function Editor() {
     {
       onSuccess(data) {
         totalTweetsRefetch().then((value) => {
+          toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
           console.debug("Retrieved total tweet count --", value.data.toNumber())
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -63,37 +72,15 @@ export default function Editor() {
   /**
    * Submit a new tweet to the contract
    */
-  // const sendTweet = () => {
-  //   try {
-  //     newTweet({
-  //       args: message.toString(),
-  //       overrides: { value: ethers.utils.parseEther(price) }
-  //     })
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  const sendTweet = async () => {
+  const sendTweet = () => {
     try {
-      console.log(signer)
-      const contract = new ethers.Contract(contractAddress, contractABI, signer)
-
-      let count = await contract.getTotalTweets()
-      console.debug("Retrieved total tweet count...", count.toNumber())
-
-      const txn = await contract.newTweet(message, {
-        value: ethers.utils.parseEther(price)
+      newTweet({
+        args: message.toString(),
+        overrides: { value: ethers.utils.parseEther(price) }
       })
-      console.debug("Mining...", txn.hash)
-
-      await txn.wait()
-      console.debug("Mined -- ", txn.hash)
-
-      count = await contract.getTotalTweets()
-      console.debug("Retrieved total tweet count...", count.toNumber())
     } catch (error) {
-      console.error(error)
+      toast.error("Please wait 1 minute before tweeting again!")
+      console.error("Transaction failed --", error)
     }
   }
 

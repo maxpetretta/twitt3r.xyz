@@ -1,32 +1,20 @@
 import Head from "next/head"
 import Link from "next/link"
 import Layout from "../components/Layout"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useAccount } from "wagmi"
 
 export default function Error404() {
   const [address, setAddress] = useState("")
-  const { refetch: accountRefetch } = useAccount()
-
-  /**
-   * Get the address of the connected account
-   */
-  const getAddress = () => {
-    try {
-      accountRefetch().then((value) => {
-        console.log(value)
-        setAddress(value.data.address)
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  /**
-   * On page load
-   */
-  useEffect(() => {
-    getAddress()
+  useAccount({
+    onSuccess(data) {
+      if (data) {
+        console.debug("Found authorized account: ", data.address)
+        setAddress(data.address)
+      } else {
+        console.debug("No authorized account found")
+      }
+    },
   })
 
   return (

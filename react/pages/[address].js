@@ -18,7 +18,7 @@ export default function Profile() {
   const { data: avatar, isSuccess: avatarSuccess } = useEnsAvatar({
     addressOrName: address,
     onError(error) {
-      console.error(error)
+      console.error("Error fetching ENS", error)
     },
   })
 
@@ -29,7 +29,7 @@ export default function Profile() {
       setEns(data ? data : address)
     },
     onError(error) {
-      console.error(error)
+      console.error("Error fetching ENS", error)
     },
   })
 
@@ -44,7 +44,7 @@ export default function Profile() {
       })
     },
     onError(error) {
-      console.error(error)
+      console.error("Error fetching ENS", error)
     },
   })
 

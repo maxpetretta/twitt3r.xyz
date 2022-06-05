@@ -1,6 +1,7 @@
+import toast from "react-hot-toast"
 import { ethers } from "ethers"
 import { useState } from "react"
-import { useAccount, useContractRead, useContractWrite } from "wagmi"
+import { useContractRead, useContractWrite } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract"
 
 export default function Controls() {
@@ -74,10 +75,17 @@ export default function Controls() {
     "updateSettings",
     {
       onSuccess(data) {
+        toast.success("Updated settings")
         console.debug("Updated settings --", data.hash)
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -90,13 +98,20 @@ export default function Controls() {
     "clear",
     {
       onSuccess(data) {
+        toast.success("Cleared tweets")
         console.debug("Cleared --", data.hash)
         totalTweetsRefetch().then((value) => {
           console.debug("Retrieved total tweet count --", value.data.toNumber())  
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -112,11 +127,18 @@ export default function Controls() {
         let status
         isPausedRefetch().then((value) => {
           status = value.data ? "Unpaused" : "Paused"
+          toast.success(status, " contract")
           console.debug(status, "--", data.hash)
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -132,11 +154,18 @@ export default function Controls() {
         let status
         isPausedRefetch().then((value) => {
           status = value.data ? "Unpaused" : "Paused"
+          toast.success(status, " contract")
           console.debug(status, "--", data.hash)
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
       }
     }
   )
@@ -157,7 +186,8 @@ export default function Controls() {
         ]
       })
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction error")
+      console.error("Transaction error --", error)
     }
   }
 
@@ -168,7 +198,8 @@ export default function Controls() {
     try {
       clear()
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction error")
+      console.error("Transaction error --", error)
     }
   }
 
@@ -185,7 +216,8 @@ export default function Controls() {
         pause()
       }
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction error")
+      console.error("Transaction error --", error)
     }
   }
 
