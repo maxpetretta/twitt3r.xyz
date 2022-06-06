@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, createContext } from "react"
+import { useState, useContext, createContext } from "react"
 import { useContractRead, useContractEvent } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
 

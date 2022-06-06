@@ -36,7 +36,7 @@
     "tailwindcss": "^3.0.24"
   },
   "lint-staged": {
-    "*.{js,css,md}": "prettier --write",
-    "*.js": "eslint --cache --fix"
+    "*.{js,jsx,css,md}": "prettier --write",
+    "*.{js,jsx}": "eslint --cache --fix"
   }
 }
