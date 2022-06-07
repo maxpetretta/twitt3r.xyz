@@ -3,7 +3,7 @@ import Nav from "./Nav"
 import Sidebar from "./Sidebar"
 import { useState } from "react"
 import { useRouter } from "next/router"
-import toast, { Toaster } from "react-hot-toast"
+import { Toaster } from "react-hot-toast"
 import { useAccount, useContractRead } from "wagmi"
 
 import { contractAddress, contractABI } from "../lib/contract.js"

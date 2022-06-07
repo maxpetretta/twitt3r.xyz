@@ -26,6 +26,8 @@ export const AppProvider = ({ children }) => {
                 from: tweet[0],
                 timestamp: new Date(tweet[1] * 1000),
                 message: tweet[2],
+                replyID: tweet[3],
+                retweetID: tweet[4],
               })
             })
             return newState
@@ -41,13 +43,15 @@ export const AppProvider = ({ children }) => {
       contractInterface: contractABI,
     },
     "NewTweet",
-    ([id, from, timestamp, message]) => {
+    ([id, from, timestamp, message, replyID, retweetID]) => {
       console.debug(
         "NewTweet",
         id.toNumber(),
         from,
         new Date(timestamp * 1000),
-        message
+        message,
+        replyID,
+        retweetID
       )
 
       setTweets((prevState) => {
@@ -56,6 +60,8 @@ export const AppProvider = ({ children }) => {
           from: from,
           timestamp: new Date(timestamp * 1000),
           message: message,
+          replyID: replyID,
+          retweetID: retweetID,
         })
         return newState
       })
@@ -71,13 +77,15 @@ export const AppProvider = ({ children }) => {
       contractInterface: contractABI,
     },
     "EditTweet",
-    ([id, from, timestamp, message]) => {
+    ([id, from, timestamp, message, replyID, retweetID]) => {
       console.debug(
         "EditTweet",
         id.toNumber(),
         from,
         new Date(timestamp * 1000),
-        message
+        message,
+        replyID,
+        retweetID
       )
 
       setTweets((prevState) => {
@@ -86,6 +94,8 @@ export const AppProvider = ({ children }) => {
           from: from,
           timestamp: new Date(timestamp * 1000),
           message: message,
+          replyID: replyID,
+          retweetID: retweetID,
         })
         return newState
       })
@@ -101,13 +111,15 @@ export const AppProvider = ({ children }) => {
       contractInterface: contractABI,
     },
     "DeleteTweet",
-    ([id, from, timestamp, message]) => {
+    ([id, from, timestamp, message, replyID, retweetID]) => {
       console.debug(
         "DeleteTweet",
         id.toNumber(),
         from,
         new Date(timestamp * 1000),
-        message
+        message,
+        replyID,
+        retweetID
       )
 
       setTweets((prevState) => {

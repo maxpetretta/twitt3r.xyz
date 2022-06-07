@@ -6,7 +6,6 @@ import {
   useContractRead,
   useContractWrite,
   useEnsAvatar,
-  useSigner,
   UserRejectedRequestError,
 } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
@@ -16,27 +15,17 @@ export default function Editor() {
   const [price, setPrice] = useState(0)
   const { data: account } = useAccount()
 
-  const { data: signer } = useSigner()
-
   /**
    * Contract hooks
    */
-  const {
-    data: avatar,
-    isSuccess: avatarSuccess,
-    refetch: avatarRefetch,
-  } = useEnsAvatar({
+  const { data: avatar } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
       console.error("Error fetching ENS", error)
     },
   })
 
-  const {
-    data: priceData,
-    error: priceError,
-    refetch: priceRefetch,
-  } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -49,11 +38,7 @@ export default function Editor() {
     }
   )
 
-  const {
-    data: totalTweetsData,
-    error: totalTweetsError,
-    refetch: totalTweetsRefetch,
-  } = useContractRead(
+  const { refetch: totalTweetsRefetch } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -61,11 +46,7 @@ export default function Editor() {
     "getTotalTweets"
   )
 
-  const {
-    data: tweetData,
-    error: tweetError,
-    write: newTweet,
-  } = useContractWrite(
+  const { write: newTweet } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -97,7 +78,7 @@ export default function Editor() {
   const sendTweet = () => {
     try {
       newTweet({
-        args: message.toString(),
+        args: [message.toString(), 0, 0],
         overrides: { value: ethers.utils.parseEther(price) },
       })
     } catch (error) {
@@ -118,7 +99,6 @@ export default function Editor() {
           <img
             src={avatar}
             className="absolute top-0 left-0 z-10 mx-3 inline h-12 w-12 rounded-full"
-            onLoad={() => setLoaded(true)}
           />
         )}
         <textarea

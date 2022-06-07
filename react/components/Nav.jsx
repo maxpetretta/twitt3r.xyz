@@ -11,17 +11,13 @@ import {
 import { contractAddress, contractABI } from "../lib/contract.js"
 import toast from "react-hot-toast"
 
-export default function Nav(props) {
+export default function Nav() {
   const [price, setPrice] = useState(0)
   const [modal, setModal] = useState(false)
-  const [address, setAddress] = useState("")
   const [message, setMessage] = useState("")
+  const [address, setAddress] = useState("")
 
-  const {
-    data: account,
-    isSuccess: accountSuccess,
-    refetch: accountRefetch,
-  } = useAccount({
+  const { data: account, refetch: accountRefetch } = useAccount({
     onSuccess(data) {
       if (data) {
         setAddress(data.address)
@@ -32,22 +28,14 @@ export default function Nav(props) {
   /**
    * Contract hooks
    */
-  const {
-    data: avatar,
-    isSuccess: avatarSuccess,
-    refetch: avatarRefetch,
-  } = useEnsAvatar({
+  const { data: avatar } = useEnsAvatar({
     addressOrName: account ? account.address : "",
     onError(error) {
       console.error(error)
     },
   })
 
-  const {
-    data: priceData,
-    error: priceError,
-    refetch: priceRefetch,
-  } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -60,11 +48,7 @@ export default function Nav(props) {
     }
   )
 
-  const {
-    data: totalTweetsData,
-    error: totalTweetsError,
-    refetch: totalTweetsRefetch,
-  } = useContractRead(
+  const { refetch: totalTweetsRefetch } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -72,11 +56,7 @@ export default function Nav(props) {
     "getTotalTweets"
   )
 
-  const {
-    data: tweetData,
-    error: tweetError,
-    write: newTweet,
-  } = useContractWrite(
+  const { write: newTweet } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -108,7 +88,7 @@ export default function Nav(props) {
   const sendTweet = () => {
     try {
       newTweet({
-        args: message.toString(),
+        args: [message.toString(), 0, 0],
         overrides: { value: ethers.utils.parseEther(price) },
       })
     } catch (error) {
@@ -121,7 +101,7 @@ export default function Nav(props) {
    */
   useEffect(() => {
     accountRefetch()
-  })
+  }, [account, accountRefetch])
 
   return (
     <nav className="flex min-h-screen w-1/4 flex-col">
@@ -318,7 +298,7 @@ export default function Nav(props) {
       )}
       {modal && (
         <div
-          className="absolute inset-x-0 top-0 bottom-1/3 z-20 m-auto flex h-80 w-128 flex-col rounded-xl bg-white"
+          className="absolute inset-x-0 top-12 z-20 m-auto w-128 flex-col rounded-xl bg-white"
           id="tweet-modal"
         >
           <button
@@ -345,13 +325,17 @@ export default function Nav(props) {
             <img
               src={avatar}
               className={
-                avatar ? "mx-3 inline h-12 w-12 rounded-full" : "hidden"
+                avatar
+                  ? "mx-3 inline h-12 w-12 self-start rounded-full"
+                  : "hidden"
               }
             />
             <img
               src="/images/egg.png"
               className={
-                avatar ? "hidden" : "mx-3 inline h-12 w-12 rounded-full"
+                avatar
+                  ? "hidden"
+                  : "mx-3 inline h-12 w-12 self-start rounded-full"
               }
             />
             <textarea
@@ -365,7 +349,7 @@ export default function Nav(props) {
                 e.target.style.height = "auto"
                 e.target.style.height = e.target.scrollHeight + "px"
               }}
-              className="mr-4 grow resize-none text-xl outline-none"
+              className="mr-4 mb-4 grow resize-none text-xl outline-none"
             />
           </div>
           <div className="mt-auto flex items-center justify-between border-t">

@@ -17,17 +17,19 @@ contract Twitt3r is Ownable, Pausable {
     uint256 timestamp;
     string message;
     bool deleted;
+    uint256 replyID;
+    uint256 retweetID;
   }
 
   // Mapped struct with index, see: https://ethereum.stackexchange.com/a/13168
-  uint256 public id = 0;
+  uint256 public id = 1; // Use id 0 for non-reply tweets
   uint256[] public tweetIDs;
   mapping(uint256 => Tweet) public tweets;
 
   mapping(address => uint256) public lastTweetedAt;
-  event NewTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message);
-  event EditTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message);
-  event DeleteTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message);
+  event NewTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message, uint256 replyID, uint256 retweetID);
+  event EditTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message, uint256 replyID, uint256 retweetID);
+  event DeleteTweet(uint256 indexed id, address indexed from, uint256 timestamp, string message, uint256 replyID, uint256 retweetID);
   event ClearTweets(uint256 id);
   event WonLottery(address winner, uint256 jackpot);
 
@@ -45,21 +47,21 @@ contract Twitt3r is Ownable, Pausable {
   }
 
   // Send a message (tweet) using the contract
-  function newTweet(string memory _message) public payable whenNotPaused {
+  function newTweet(string memory _message, uint256 _replyID, uint256 _retweetID) public payable whenNotPaused {
     require(msg.value >= price, "Amount sent is incorrect");
     require(bytes(_message).length <= 280, "Limit is 280 characters!");
     require(lastTweetedAt[msg.sender] + 1 minutes < block.timestamp, "Please wait a minute before tweeting again!");
     lastTweetedAt[msg.sender] = block.timestamp;
 
     console.log("%s has tweeted!", msg.sender); // DEBUG
-    tweets[id] = Tweet(msg.sender, block.timestamp, _message, false);
+    tweets[id] = Tweet(msg.sender, block.timestamp, _message, false, _replyID, _retweetID);
     tweetIDs.push(id);
 
     // Check if the sender has won the jackpot
     checkLottery(payable(msg.sender));
 
     // Alert subscribers to the new tweet transaction
-    emit NewTweet(id, msg.sender, block.timestamp, _message);
+    emit NewTweet(id, msg.sender, block.timestamp, _message, _replyID, _retweetID);
     id++;
   }
 
@@ -71,7 +73,7 @@ contract Twitt3r is Ownable, Pausable {
     require(bytes(_message).length <= 280, "Limit is 280 characters!");
     tweets[_id].message = _message;
 
-    emit EditTweet(_id, msg.sender, block.timestamp, tweets[_id].message);
+    emit EditTweet(_id, msg.sender, block.timestamp, tweets[_id].message, tweets[_id].replyID, tweets[_id].retweetID);
   }
 
   // Delete a tweet from the contract
@@ -81,7 +83,7 @@ contract Twitt3r is Ownable, Pausable {
     require(tweets[_id].from == msg.sender, "Sender does not match the given tweet");
     tweets[_id].deleted = true;
 
-    emit DeleteTweet(_id, msg.sender, block.timestamp, tweets[_id].message);
+    emit DeleteTweet(_id, msg.sender, block.timestamp, tweets[_id].message, tweets[_id].replyID, tweets[_id].retweetID);
   }
 
   // Manage the contract's state
@@ -91,7 +93,7 @@ contract Twitt3r is Ownable, Pausable {
       delete tweets[i];
     }
     delete tweetIDs;
-    id = 0;
+    id = 1;
 
     emit ClearTweets(lastID);
   }
