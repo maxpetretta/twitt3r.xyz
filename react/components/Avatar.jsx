@@ -23,11 +23,23 @@ export default function Avatar(props) {
     <>
       <img
         src={avatar}
-        className={avatar ? "mx-3 inline h-12 w-12 rounded-full" : "hidden"}
+        className={
+          avatar
+            ? props.styles
+              ? props.styles
+              : "mx-3 inline h-12 w-12 self-start rounded-full"
+            : "hidden"
+        }
       />
       <img
         src="/images/egg.png"
-        className={avatar ? "hidden" : "mx-3 inline h-12 w-12 rounded-full"}
+        className={
+          avatar
+            ? "hidden"
+            : props.styles
+            ? props.styles
+            : "mx-3 inline h-12 w-12 self-start rounded-full"
+        }
       />
     </>
   )

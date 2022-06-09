@@ -35,8 +35,12 @@ export default function Address(props) {
   return (
     <>
       <Link href={`/${props.address}`}>
-        <a className="font-semibold text-black" title={props.address}>
+        <a
+          className={props.styles ? props.styles : "font-semibold text-black"}
+          title={props.address}
+        >
           {ens}
+          {props.suffix ? ` ${props.suffix}` : null}
         </a>
       </Link>
     </>

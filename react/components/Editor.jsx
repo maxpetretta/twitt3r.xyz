@@ -11,9 +11,17 @@ import { contractAddress, contractABI } from "../lib/contract.js"
 import Avatar from "./Avatar.jsx"
 
 export default function Editor() {
+  const [address, setAddress] = useState()
   const [message, setMessage] = useState("")
   const [price, setPrice] = useState(0)
-  const { data: account } = useAccount()
+
+  useAccount({
+    onSuccess(data) {
+      if (data) {
+        setAddress(data.address)
+      }
+    },
+  })
 
   /**
    * Contract hooks
@@ -84,7 +92,7 @@ export default function Editor() {
     <section className="flex flex-col border-b">
       <h2 className="mt-4 ml-3">Latest Tw33ts</h2>
       <div className="mt-2 flex items-center">
-        <Avatar address={account.address} />
+        <Avatar address={address} />
         <textarea
           type="text"
           rows="1"

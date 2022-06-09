@@ -77,7 +77,10 @@ export default function Profile() {
           </Link>
           <div className="mt-4 h-48 w-full bg-twitter-blue" />
           <div className="relative -top-16">
-            <Avatar address={address} />
+            <Avatar
+              address={address}
+              styles="top-0 left-0 z-10 ml-4 inline h-32 w-32 rounded-full border-4 border-white"
+            />
             <a href={`https://etherscan.io/address/${address}`}>
               <h1 className="mt-4 text-xl text-black">{ens}</h1>
             </a>

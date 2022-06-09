@@ -211,7 +211,7 @@ export default function Tweet(props) {
       setTweet(tweets.get(props.id))
     } else {
       const retweetID = tweets.get(props.id).retweetID
-      setTweet(tweets.get(retweetID))
+      setTweet(tweets.get(retweetID.toNumber()))
       setRetweet(tweets.get(props.id))
     }
   }, [tweets, props.id])
@@ -219,7 +219,7 @@ export default function Tweet(props) {
   return (
     <>
       {retweet && (
-        <>
+        <div className="ml-2 mt-2 flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -230,15 +230,18 @@ export default function Tweet(props) {
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="inline text-gray-600"
+            className="inline text-gray-500"
           >
             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
             <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
             <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
           </svg>
-          <Address address={retweet.from} />
-          <span className="ml-2 font-semibold text-gray-600">retweeted</span>
-        </>
+          <Address
+            address={retweet.from}
+            styles="ml-2 font-semibold text-gray-500"
+            suffix="retweeted"
+          />
+        </div>
       )}
       {tweet && (
         <div className="flex flex-row pt-4 pb-2">
@@ -399,8 +402,9 @@ export default function Tweet(props) {
                 - {dayjs(tweet.timestamp).fromNow()}
               </span>
               <div>{tweet.message}</div>
-              <div className="mt-4 text-sm text-gray-500">
-                Replying to <Address address={tweet.from} />
+              <div className="text mt-4 text-sm text-gray-500">
+                Replying to{" "}
+                <Address address={tweet.from} styles="font-semibold" />
               </div>
             </div>
           </div>
