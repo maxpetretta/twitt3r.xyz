@@ -156,7 +156,6 @@ export const AppProvider = ({ children }) => {
 
   return (
     <AppContext.Provider value={{ tweets, setTweets }}>
-      {/* {console.log("Tweets", tweets)} */}
       {children}
     </AppContext.Provider>
   )

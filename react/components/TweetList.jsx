@@ -7,16 +7,13 @@ export default function TweetList(props) {
   /**
    * Filter all tweets using the selected address
    */
-  const getFilteredTweets = () => {
-    // console.log("Before", tweets)
+  const getAuthorTweets = () => {
     let filtered = [...tweets.entries()].filter(
       (tweet) => tweet[1].replyID.eq(0) && !tweet[1].deleted
     )
-    // console.log("Filtered", filtered)
-    if (props.filter) {
-      filtered = filtered.filter((tweet) => tweet[1].from == props.filter)
+    if (props.author) {
+      filtered = filtered.filter((tweet) => tweet[1].from == props.author)
     }
-    // console.log("Filtered", filtered)
     return filtered
   }
 
@@ -33,7 +30,7 @@ export default function TweetList(props) {
 
   return (
     <section>
-      {Array.from(getFilteredTweets(), ([id]) => {
+      {Array.from(getAuthorTweets(), ([id]) => {
         const replies = getReplies(id)
         return (
           <div className="border-b">

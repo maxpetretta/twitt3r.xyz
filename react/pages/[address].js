@@ -43,7 +43,7 @@ export default function Profile() {
   })
 
   /**
-   * On page load fetch the ENS profile description (if exists)
+   * On page load, fetch the ENS profile description (if exists)
    */
   useEffect(() => {
     setEns(address)
@@ -87,7 +87,7 @@ export default function Profile() {
             <p className="mt-4">{description}</p>
           </div>
         </section>
-        <TweetList filter={address} />
+        <TweetList author={address} />
       </Layout>
     </>
   )

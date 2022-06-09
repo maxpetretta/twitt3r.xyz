@@ -16,11 +16,7 @@ export default function Controls() {
   /**
    * Contract hooks
    */
-  const {
-    data: priceData,
-    error: priceError,
-    refetch: priceRefetch,
-  } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -33,11 +29,7 @@ export default function Controls() {
     }
   )
 
-  const {
-    data: oddsData,
-    error: oddsError,
-    refetch: oddsRefetch,
-  } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -50,11 +42,7 @@ export default function Controls() {
     }
   )
 
-  const {
-    data: jackpotData,
-    error: jackpotError,
-    refetch: jackpotRefetch,
-  } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -67,11 +55,7 @@ export default function Controls() {
     }
   )
 
-  const {
-    data: totalTweetsData,
-    error: totalTweetsError,
-    refetch: totalTweetsRefetch,
-  } = useContractRead(
+  const { refetch: totalTweetsRefetch } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -79,11 +63,7 @@ export default function Controls() {
     "getTotalTweets"
   )
 
-  const {
-    data: isPausedData,
-    error: isPausedError,
-    refetch: isPausedRefetch,
-  } = useContractRead(
+  const { data: isPausedData } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -91,11 +71,7 @@ export default function Controls() {
     "isPaused"
   )
 
-  const {
-    data: settingsData,
-    error: settingsError,
-    write: updateSettings,
-  } = useContractWrite(
+  const { write: updateSettings } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -118,11 +94,7 @@ export default function Controls() {
     }
   )
 
-  const {
-    data: clearData,
-    error: clearError,
-    write: clear,
-  } = useContractWrite(
+  const { write: clear } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -148,11 +120,7 @@ export default function Controls() {
     }
   )
 
-  const {
-    data: pauseData,
-    error: pauseError,
-    write: pause,
-  } = useContractWrite(
+  const { write: pause } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -175,11 +143,7 @@ export default function Controls() {
     }
   )
 
-  const {
-    data: unpauseData,
-    error: unpauseError,
-    write: unpause,
-  } = useContractWrite(
+  const { write: unpause } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
