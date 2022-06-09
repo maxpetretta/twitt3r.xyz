@@ -5,10 +5,10 @@ import {
   useAccount,
   useContractRead,
   useContractWrite,
-  useEnsAvatar,
   UserRejectedRequestError,
 } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
+import Avatar from "./Avatar.jsx"
 
 export default function Editor() {
   const [message, setMessage] = useState("")
@@ -18,13 +18,6 @@ export default function Editor() {
   /**
    * Contract hooks
    */
-  const { data: avatar } = useEnsAvatar({
-    addressOrName: account ? account.address : "",
-    onError(error) {
-      console.error("Error fetching ENS", error)
-    },
-  })
-
   useContractRead(
     {
       addressOrName: contractAddress,
@@ -91,16 +84,7 @@ export default function Editor() {
     <section className="flex flex-col border-b">
       <h2 className="mt-4 ml-3">Latest Tw33ts</h2>
       <div className="mt-2 flex items-center">
-        <img
-          src="/images/egg.png"
-          className="mx-3 inline h-12 w-12 rounded-full"
-        />
-        {avatar && (
-          <img
-            src={avatar}
-            className="absolute top-0 left-0 z-10 mx-3 inline h-12 w-12 rounded-full"
-          />
-        )}
+        <Avatar address={account.address} />
         <textarea
           type="text"
           rows="1"

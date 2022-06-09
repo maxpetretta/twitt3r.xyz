@@ -1,11 +1,11 @@
 import Link from "next/link"
+import Avatar from "./Avatar"
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
 import {
   useAccount,
   useContractRead,
   useContractWrite,
-  useEnsAvatar,
   UserRejectedRequestError,
 } from "wagmi"
 import { contractAddress, contractABI } from "../lib/contract.js"
@@ -28,13 +28,6 @@ export default function Nav() {
   /**
    * Contract hooks
    */
-  const { data: avatar } = useEnsAvatar({
-    addressOrName: account ? account.address : "",
-    onError(error) {
-      console.error(error)
-    },
-  })
-
   useContractRead(
     {
       addressOrName: contractAddress,
@@ -91,6 +84,7 @@ export default function Nav() {
         args: [message.toString(), 0, 0],
         overrides: { value: ethers.utils.parseEther(price) },
       })
+      setModal(false)
     } catch (error) {
       console.error(error)
     }
@@ -322,22 +316,7 @@ export default function Nav() {
             </svg>
           </button>
           <div className="mt-4 flex items-center">
-            <img
-              src={avatar}
-              className={
-                avatar
-                  ? "mx-3 inline h-12 w-12 self-start rounded-full"
-                  : "hidden"
-              }
-            />
-            <img
-              src="/images/egg.png"
-              className={
-                avatar
-                  ? "hidden"
-                  : "mx-3 inline h-12 w-12 self-start rounded-full"
-              }
-            />
+            <Avatar address={address} />
             <textarea
               type="text"
               rows="1"

@@ -3,7 +3,8 @@ import Layout from "../components/Layout"
 import TweetList from "../components/TweetList"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
-import { useEnsAvatar, useEnsName, useEnsResolver } from "wagmi"
+import { useEnsName, useEnsResolver } from "wagmi"
+import Avatar from "../components/Avatar"
 
 export default function Profile() {
   // const address = "0x983110309620d911731ac0932219af06091b6744"
@@ -15,13 +16,6 @@ export default function Profile() {
   /**
    * Contract hooks
    */
-  const { data: avatar, isSuccess: avatarSuccess } = useEnsAvatar({
-    addressOrName: address,
-    onError(error) {
-      console.error("Error fetching ENS", error)
-    },
-  })
-
   const { data: name, refetch: nameRefetch } = useEnsName({
     address: address,
     enabled: false,
@@ -83,16 +77,7 @@ export default function Profile() {
           </Link>
           <div className="mt-4 h-48 w-full bg-twitter-blue" />
           <div className="relative -top-16">
-            <img
-              src="/images/egg.png"
-              className="ml-4 h-32 w-32 rounded-full border-4 border-white"
-            />
-            {avatarSuccess && (
-              <img
-                src={avatar}
-                className="absolute top-0 left-0 z-10 ml-4 inline h-32 w-32 rounded-full border-4 border-white"
-              />
-            )}
+            <Avatar address={address} />
             <a href={`https://etherscan.io/address/${address}`}>
               <h1 className="mt-4 text-xl text-black">{ens}</h1>
             </a>

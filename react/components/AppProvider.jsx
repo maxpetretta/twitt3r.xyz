@@ -22,12 +22,13 @@ export const AppProvider = ({ children }) => {
           setTweets((prevState) => {
             let newState = new Map(prevState)
             data.forEach((tweet, id) => {
-              newState.set(id, {
+              newState.set(id + 1, {
                 from: tweet[0],
                 timestamp: new Date(tweet[1] * 1000),
                 message: tweet[2],
-                replyID: tweet[3],
-                retweetID: tweet[4],
+                deleted: tweet[3],
+                replyID: tweet[4],
+                retweetID: tweet[5],
               })
             })
             return newState
@@ -43,13 +44,14 @@ export const AppProvider = ({ children }) => {
       contractInterface: contractABI,
     },
     "NewTweet",
-    ([id, from, timestamp, message, replyID, retweetID]) => {
+    ([id, from, timestamp, message, deleted, replyID, retweetID]) => {
       console.debug(
         "NewTweet",
         id.toNumber(),
         from,
         new Date(timestamp * 1000),
         message,
+        deleted,
         replyID,
         retweetID
       )
@@ -60,6 +62,7 @@ export const AppProvider = ({ children }) => {
           from: from,
           timestamp: new Date(timestamp * 1000),
           message: message,
+          deleted: deleted,
           replyID: replyID,
           retweetID: retweetID,
         })
@@ -77,13 +80,14 @@ export const AppProvider = ({ children }) => {
       contractInterface: contractABI,
     },
     "EditTweet",
-    ([id, from, timestamp, message, replyID, retweetID]) => {
+    ([id, from, timestamp, message, deleted, replyID, retweetID]) => {
       console.debug(
         "EditTweet",
         id.toNumber(),
         from,
         new Date(timestamp * 1000),
         message,
+        deleted,
         replyID,
         retweetID
       )
@@ -94,6 +98,7 @@ export const AppProvider = ({ children }) => {
           from: from,
           timestamp: new Date(timestamp * 1000),
           message: message,
+          deleted: deleted,
           replyID: replyID,
           retweetID: retweetID,
         })
@@ -111,13 +116,14 @@ export const AppProvider = ({ children }) => {
       contractInterface: contractABI,
     },
     "DeleteTweet",
-    ([id, from, timestamp, message, replyID, retweetID]) => {
+    ([id, from, timestamp, message, deleted, replyID, retweetID]) => {
       console.debug(
         "DeleteTweet",
         id.toNumber(),
         from,
         new Date(timestamp * 1000),
         message,
+        deleted,
         replyID,
         retweetID
       )
@@ -150,6 +156,7 @@ export const AppProvider = ({ children }) => {
 
   return (
     <AppContext.Provider value={{ tweets, setTweets }}>
+      {/* {console.log("Tweets", tweets)} */}
       {children}
     </AppContext.Provider>
   )

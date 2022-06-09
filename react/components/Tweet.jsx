@@ -1,60 +1,33 @@
-import Link from "next/link"
 import dayjs from "dayjs"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ethers } from "ethers"
 import {
   useAccount,
   useContractRead,
   useContractWrite,
-  useEnsName,
-  useEnsAvatar,
   UserRejectedRequestError,
 } from "wagmi"
+import { useTweets } from "./AppProvider"
 import { contractAddress, contractABI } from "../lib/contract.js"
 import toast from "react-hot-toast"
+import Avatar from "./Avatar"
+import Address from "./Address"
 
 export default function Tweet(props) {
   var relativeTime = require("dayjs/plugin/relativeTime")
   dayjs.extend(relativeTime)
 
+  const [tweet, setTweet] = useState()
+  const [retweet, setRetweet] = useState()
   const [price, setPrice] = useState(0)
   const [modal, setModal] = useState(false)
   const [message, setMessage] = useState("")
-  const [replyENS, setReplyENS] = useState()
   const { data: account } = useAccount()
+  const { tweets } = useTweets()
 
   /**
    * Contract hooks
    */
-  useEnsName({
-    address: props.tweet.from,
-    onSuccess(data) {
-      if (data) {
-        setReplyENS(data)
-      } else {
-        setReplyENS(truncateAddress(props.tweet.from))
-      }
-    },
-    onError(error) {
-      setReplyENS(truncateAddress(props.tweet.from))
-      console.error("Error fetching ENS", error)
-    },
-  })
-
-  const { data: userAvatar } = useEnsAvatar({
-    addressOrName: account ? account.address : "",
-    onError(error) {
-      console.error("Error fetching ENS", error)
-    },
-  })
-
-  const { data: replyAvatar } = useEnsAvatar({
-    addressOrName: props.tweet.from,
-    onError(error) {
-      console.error("Error fetching ENS", error)
-    },
-  })
-
   useContractRead(
     {
       addressOrName: contractAddress,
@@ -166,6 +139,7 @@ export default function Tweet(props) {
         args: [message.toString(), id, 0],
         overrides: { value: ethers.utils.parseEther(price) },
       })
+      setModal(false)
     } catch (error) {
       toast.error("Please wait 1 minute before tweeting again!")
       console.error("Transaction failed --", error)
@@ -176,7 +150,7 @@ export default function Tweet(props) {
    * Retweet the specified tweet
    * @param {number} id - The tweet ID number
    */
-  const retweet = async (id) => {
+  const sendRetweet = async (id) => {
     try {
       newTweet({
         args: ["", 0, id],
@@ -219,132 +193,167 @@ export default function Tweet(props) {
   }
 
   /**
-   * Shorten the given address for readability
-   * @param {string} address - The sender's wallet address
+   * Filter for all replies to a tweet
+   * @param {number} id
    */
-  const truncateAddress = (address) => {
-    const match = address.match(/^(0x.{4}).+(.{4})$/)
-    return match[1] + "..." + match[2]
+  const getReplies = (id) => {
+    let replies = [...tweets.entries()].filter(
+      (tweet) => tweet[1].replyID.eq(id) && !tweet[1].deleted
+    )
+    return replies
   }
+
+  /*
+   * On page load, get the relevant tweet
+   */
+  useEffect(() => {
+    if (tweets.get(props.id).retweetID.isZero()) {
+      setTweet(tweets.get(props.id))
+    } else {
+      const retweetID = tweets.get(props.id).retweetID
+      setTweet(tweets.get(retweetID))
+      setRetweet(tweets.get(props.id))
+    }
+  }, [tweets, props.id])
 
   return (
     <>
-      <div className="flex flex-row border-b pt-4 pb-2">
-        <img
-          src={replyAvatar}
-          className={
-            replyAvatar ? "mx-3 inline h-12 w-12 rounded-full" : "hidden"
-          }
-        />
-        <img
-          src="/images/egg.png"
-          className={
-            replyAvatar ? "hidden" : "mx-3 inline h-12 w-12 rounded-full"
-          }
-        />
-        <div className="grow">
-          <Link href={`/${props.tweet.from}`}>
-            <a className="font-semibold text-black" title={props.tweet.from}>
-              {replyENS}
-            </a>
-          </Link>
-          <span
-            className="ml-1"
-            title={props.tweet.timestamp.toLocaleString("en-US", {
-              timeStyle: "short",
-              dateStyle: "long",
-            })}
+      {retweet && (
+        <>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="inline text-gray-600"
           >
-            - {dayjs(props.tweet.timestamp).fromNow()}
-          </span>
-          <div>{props.tweet.message}</div>
-          <div className="mt-1 mr-12 flex justify-between">
-            <button
-              className="rounded-full p-2 transition duration-200 hover:bg-gray-200"
-              onClick={() => setModal(true)}
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+          </svg>
+          <Address address={retweet.from} />
+          <span className="ml-2 font-semibold text-gray-600">retweeted</span>
+        </>
+      )}
+      {tweet && (
+        <div className="flex flex-row pt-4 pb-2">
+          <Avatar address={tweet.from} />
+          <div className="grow">
+            <Address address={tweet.from} />
+            <span
+              className="ml-1"
+              title={tweet.timestamp.toLocaleString("en-US", {
+                timeStyle: "short",
+                dateStyle: "long",
+              })}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              - {dayjs(tweet.timestamp).fromNow()}
+            </span>
+            <div>{tweet.message}</div>
+            <div className="mt-1 mr-12 flex justify-between">
+              <button
+                className="rounded-full p-2 transition duration-200 hover:bg-gray-200"
+                onClick={() => setModal(true)}
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
-              </svg>
-            </button>
-            <button
-              className="rounded-full p-2 transition duration-200 hover:bg-gray-200"
-              onClick={() => retweet(props.id)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-500"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
+                </svg>
+              </button>
+              <button
+                className="rounded-full p-2 transition duration-200 hover:bg-gray-200"
+                onClick={() => sendRetweet(props.id)}
               >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
-                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
-              </svg>
-            </button>
-            <button className="rounded-full p-2 transition duration-200 hover:bg-gray-200">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-500"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                  <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+              </button>
+              <button className="rounded-full p-2 transition duration-200 hover:bg-gray-200">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-500"
+                >
+                  <desc>
+                    Download more icon variants from
+                    https://tabler-icons.io/i/pencil
+                  </desc>
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
+                  <line x1="13.5" y1="6.5" x2="17.5" y2="10.5"></line>
+                </svg>
+              </button>
+              <button
+                className="rounded-full p-2 transition duration-200 hover:bg-gray-200"
+                onClick={() => remove(props.id)}
               >
-                <desc>
-                  Download more icon variants from
-                  https://tabler-icons.io/i/pencil
-                </desc>
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4"></path>
-                <line x1="13.5" y1="6.5" x2="17.5" y2="10.5"></line>
-              </svg>
-            </button>
-            <button
-              className="rounded-full p-2 transition duration-200 hover:bg-gray-200"
-              onClick={() => remove(props.id)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <line x1="4" y1="7" x2="20" y2="7"></line>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
-                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-500"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <line x1="4" y1="7" x2="20" y2="7"></line>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                  <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                  <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+      <section>
+        {props.replies &&
+          Array.from(props.replies, ([id, tweet]) => {
+            const replies = getReplies(id)
+            return <Tweet id={id} key={id} tweet={tweet} replies={replies} />
+          })}
+      </section>
       {modal && (
         <div
           className="fixed inset-0 z-10 bg-gray-500 bg-opacity-50"
@@ -377,66 +386,26 @@ export default function Tweet(props) {
             </svg>
           </button>
           <div className="mt-4 flex">
-            <img
-              src={replyAvatar}
-              className={
-                replyAvatar
-                  ? "mx-3 inline h-12 w-12 self-start rounded-full"
-                  : "hidden"
-              }
-            />
-            <img
-              src="/images/egg.png"
-              className={
-                replyAvatar
-                  ? "hidden"
-                  : "mx-3 inline h-12 w-12 self-start rounded-full"
-              }
-            />
+            <Avatar address={tweet.from} />
             <div className="grow">
-              <Link href={`/${props.tweet.from}`}>
-                <a
-                  className="font-semibold text-black"
-                  title={props.tweet.from}
-                >
-                  {replyENS}
-                </a>
-              </Link>
+              <Address address={tweet.from} />
               <span
                 className="ml-1"
-                title={props.tweet.timestamp.toLocaleString("en-US", {
+                title={tweet.timestamp.toLocaleString("en-US", {
                   timeStyle: "short",
                   dateStyle: "long",
                 })}
               >
-                - {dayjs(props.tweet.timestamp).fromNow()}
+                - {dayjs(tweet.timestamp).fromNow()}
               </span>
-              <div>{props.tweet.message}</div>
+              <div>{tweet.message}</div>
               <div className="mt-4 text-sm text-gray-500">
-                Replying to{" "}
-                <Link href={`/${props.tweet.from}`}>
-                  <a>{replyENS}</a>
-                </Link>
+                Replying to <Address address={tweet.from} />
               </div>
             </div>
           </div>
           <div className="mt-8 flex flex-1 items-center">
-            <img
-              src={userAvatar}
-              className={
-                userAvatar
-                  ? "mx-3 inline h-12 w-12 self-start rounded-full"
-                  : "hidden"
-              }
-            />
-            <img
-              src="/images/egg.png"
-              className={
-                userAvatar
-                  ? "hidden"
-                  : "mx-3 inline h-12 w-12 self-start rounded-full"
-              }
-            />
+            <Avatar address={account.address} />
             <textarea
               type="text"
               rows="1"
