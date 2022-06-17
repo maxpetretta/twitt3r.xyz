@@ -27,7 +27,10 @@ export default function Layout(props) {
         console.debug("Found authorized account: ", data.address)
 
         // Check if this is the owner's wallet
-        if (ownerData.toUpperCase() === account.address.toUpperCase()) {
+        if (
+          ownerData &&
+          ownerData.toUpperCase() === account.address.toUpperCase()
+        ) {
           setIsOwner(true)
         } else {
           setIsOwner(false)

@@ -181,8 +181,7 @@ export default function Tweet(props) {
       setEditModal(false)
     } catch (error) {
       toast.error("Please wait 1 minute before tweeting again!")
-      console.log(error)
-      // console.error("Transaction failed --", error)
+      console.error("Transaction failed --", error)
     }
   }
 
@@ -253,9 +252,21 @@ export default function Tweet(props) {
         </div>
       )}
       {tweet && (
-        <div className="flex flex-row pt-4 pb-2">
-          <Avatar address={tweet.from} />
-          <div className="grow">
+        <div className="flex">
+          <div className="flex min-h-fit flex-col">
+            <div
+              className={
+                retweet || tweet.replyID.isZero()
+                  ? "pt-3"
+                  : "mb-1 h-3 w-0.5 self-center bg-gray-400"
+              }
+            />
+            <Avatar address={tweet.from} />
+            {props.replies.length > 0 && (
+              <div className="mt-1 h-full w-0.5 self-center bg-gray-400" />
+            )}
+          </div>
+          <div className="grow pt-3 pb-3">
             <Address address={tweet.from} />
             <span
               className="ml-1"
