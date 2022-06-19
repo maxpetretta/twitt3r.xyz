@@ -1,10 +1,9 @@
-// import Link from "next/link"
 import Controls from "./Controls"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 
 export default function Sidebar(props) {
   return (
-    <aside className="flex min-h-screen w-1/4 flex-col">
+    <aside className="hidden min-h-screen w-1/4 flex-col lg:flex">
       <div className="mt-3 self-center">
         <ConnectButton chainStatus="none" showBalance={true} />
       </div>

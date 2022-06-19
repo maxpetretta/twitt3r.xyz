@@ -1,12 +1,13 @@
-import Head from "next/head"
 import Nav from "./Nav"
 import Sidebar from "./Sidebar"
+import TweetModal from "./TweetModal"
+import { contractAddress, contractABI } from "../lib/contract.js"
+
+import Head from "next/head"
 import { useState } from "react"
 import { useRouter } from "next/router"
 import { Toaster } from "react-hot-toast"
 import { useAccount, useContractRead } from "wagmi"
-
-import { contractAddress, contractABI } from "../lib/contract.js"
 
 export default function Layout(props) {
   const { children, ...pageMeta } = props
@@ -20,10 +21,13 @@ export default function Layout(props) {
     ...pageMeta,
   }
 
+  const [modal, setModal] = useState(false)
+  const [address, setAddress] = useState("")
   const [isOwner, setIsOwner] = useState(false)
   const { data: account } = useAccount({
     onSuccess(data) {
       if (data) {
+        setAddress(data.address)
         console.debug("Found authorized account: ", data.address)
 
         // Check if this is the owner's wallet
@@ -79,9 +83,28 @@ export default function Layout(props) {
         <div className="flex flex-row">
           <Toaster position="top-right" />
           <Nav />
-          <main className="w-1/2 border">{children}</main>
+          <main className="w-full border lg:w-1/2">{children}</main>
           <Sidebar isOwner={isOwner} />
         </div>
+        <button
+          className="fixed bottom-4 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-twitter-blue md:hidden"
+          onClick={() => setModal(true)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="30"
+            viewBox="0 0 24 24"
+            strokeWidth="0.1"
+            stroke="white"
+            fill="white"
+          >
+            <path d="M8.8 7.2H5.6V3.9c0-.4-.3-.8-.8-.8s-.7.4-.7.8v3.3H.8c-.4 0-.8.3-.8.8s.3.8.8.8h3.3v3.3c0 .4.3.8.8.8s.8-.3.8-.8V8.7H9c.4 0 .8-.3.8-.8s-.5-.7-1-.7zm15-4.9v-.1h-.1c-.1 0-9.2 1.2-14.4 11.7-3.8 7.6-3.6 9.9-3.3 9.9.3.1 3.4-6.5 6.7-9.2 5.2-1.1 6.6-3.6 6.6-3.6s-1.5.2-2.1.2c-.8 0-1.4-.2-1.7-.3 1.3-1.2 2.4-1.5 3.5-1.7.9-.2 1.8-.4 3-1.2 2.2-1.6 1.9-5.5 1.8-5.7z"></path>
+          </svg>
+        </button>
+        {modal && (
+          <TweetModal address={address} modal={modal} setModal={setModal} />
+        )}
       </div>
     </>
   )

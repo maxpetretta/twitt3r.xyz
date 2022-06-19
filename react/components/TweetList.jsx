@@ -33,7 +33,7 @@ export default function TweetList(props) {
       {Array.from(getAuthorTweets(), ([id]) => {
         const replies = getReplies(id)
         return (
-          <div className="border-b">
+          <div key={id} className="border-b">
             <Tweet id={id} key={id} replies={replies} />
           </div>
         )

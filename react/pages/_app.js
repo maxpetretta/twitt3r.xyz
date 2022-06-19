@@ -13,6 +13,7 @@ import {
   connectorsForWallets,
   wallet,
 } from "@rainbow-me/rainbowkit"
+
 import "../styles/globals.css"
 import "@rainbow-me/rainbowkit/styles.css"
 

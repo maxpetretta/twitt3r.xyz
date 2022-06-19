@@ -1,4 +1,12 @@
+import Avatar from "./Avatar"
+import Address from "./Address"
+import ReplyModal from "./ReplyModal"
+import EditModal from "./EditModal"
+import { useTweets } from "./AppProvider"
+import { contractAddress, contractABI } from "../lib/contract.js"
+
 import dayjs from "dayjs"
+import toast from "react-hot-toast"
 import { useEffect, useState } from "react"
 import { ethers } from "ethers"
 import {
@@ -7,11 +15,6 @@ import {
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { useTweets } from "./AppProvider"
-import { contractAddress, contractABI } from "../lib/contract.js"
-import toast from "react-hot-toast"
-import Avatar from "./Avatar"
-import Address from "./Address"
 
 export default function Tweet(props) {
   var relativeTime = require("dayjs/plugin/relativeTime")
@@ -84,32 +87,6 @@ export default function Tweet(props) {
     }
   )
 
-  const { write: editTweet } = useContractWrite(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI,
-    },
-    "editTweet",
-    {
-      onSuccess(data) {
-        totalTweetsRefetch().then((value) => {
-          toast.success("Edited tweet!")
-          console.debug("Edited --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
-        })
-      },
-      onError(error) {
-        if (error instanceof UserRejectedRequestError) {
-          toast.error("User rejected transaction")
-          console.error("User rejected transaction")
-        } else {
-          toast.error("You are not the author!")
-          console.error("Transaction failed --", error)
-        }
-      },
-    }
-  )
-
   const { write: deleteTweet } = useContractWrite(
     {
       addressOrName: contractAddress,
@@ -129,29 +106,12 @@ export default function Tweet(props) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
         } else {
-          toast.error("Transaction failed")
+          toast.error("You are not the author!")
           console.error("Transaction failed --", error)
         }
       },
     }
   )
-
-  /**
-   * Reply to the specified tweet
-   * @param {number} id - The tweet ID number
-   */
-  const sendReply = async (id) => {
-    try {
-      newTweet({
-        args: [message.toString(), id, 0],
-        overrides: { value: ethers.utils.parseEther(price) },
-      })
-      setReplyModal(false)
-    } catch (error) {
-      toast.error("Please wait 1 minute before tweeting again!")
-      console.error("Transaction failed --", error)
-    }
-  }
 
   /**
    * Retweet the specified tweet
@@ -165,22 +125,6 @@ export default function Tweet(props) {
       })
     } catch (error) {
       toast.error("Transaction failed")
-      console.error("Transaction failed --", error)
-    }
-  }
-
-  /**
-   * Update the specified tweet from the contract
-   * @param {number} id - The tweet ID number
-   */
-  const sendEdit = async (id) => {
-    try {
-      editTweet({
-        args: [id, message],
-      })
-      setEditModal(false)
-    } catch (error) {
-      toast.error("Please wait 1 minute before tweeting again!")
       console.error("Transaction failed --", error)
     }
   }
@@ -375,9 +319,9 @@ export default function Tweet(props) {
       )}
       <section>
         {props.replies &&
-          Array.from(props.replies, ([id, tweet]) => {
+          Array.from(props.replies, ([id]) => {
             const replies = getReplies(id)
-            return <Tweet id={id} key={id} tweet={tweet} replies={replies} />
+            return <Tweet id={id} key={id} replies={replies} />
           })}
       </section>
       {(replyModal || editModal) && (
@@ -387,138 +331,22 @@ export default function Tweet(props) {
         />
       )}
       {replyModal && (
-        <div
-          className="absolute inset-x-0 top-12 z-20 m-auto w-128 flex-col rounded-xl bg-white"
-          id="reply-modal"
-        >
-          <button
-            className="float-right m-2 h-fit w-fit rounded-full p-2 transition duration-200 hover:bg-gray-200"
-            onClick={() => setReplyModal(false)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          <div className="mt-4 flex">
-            <Avatar address={tweet.from} />
-            <div className="grow">
-              <Address address={tweet.from} />
-              <span
-                className="ml-1"
-                title={tweet.timestamp.toLocaleString("en-US", {
-                  timeStyle: "short",
-                  dateStyle: "long",
-                })}
-              >
-                - {dayjs(tweet.timestamp).fromNow()}
-              </span>
-              <div>{tweet.message}</div>
-              <div className="text mt-4 text-sm text-gray-500">
-                Replying to{" "}
-                <Address address={tweet.from} styles="font-semibold" />
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 flex flex-1 items-center">
-            <Avatar address={address} />
-            <textarea
-              type="text"
-              rows="1"
-              value={message}
-              maxLength="280"
-              placeholder="Tw33t your reply"
-              onChange={(e) => setMessage(e.target.value)}
-              onInput={(e) => {
-                e.target.style.height = "auto"
-                e.target.style.height = e.target.scrollHeight + "px"
-              }}
-              className="mr-4 mb-4 grow resize-none text-xl outline-none"
-            />
-          </div>
-          <div className="mt-auto flex items-center justify-between border-t">
-            <span className="m-3 text-sm text-gray-500">Price: {price}Ξ</span>
-            <div>
-              <span className="text-gray-500">
-                {message ? message.length + "/280" : ""}
-              </span>
-              <button
-                className="button m-3 self-end"
-                onClick={() => sendReply(props.id)}
-              >
-                Tw33t
-              </button>
-            </div>
-          </div>
-        </div>
+        <ReplyModal
+          address={address}
+          tweet={tweet}
+          modal={replyModal}
+          setModal={setReplyModal}
+        />
       )}
       {editModal && (
-        <div
-          className="absolute inset-x-0 top-12 z-20 m-auto w-128 flex-col rounded-xl bg-white"
-          id="edit-modal"
-        >
-          <button
-            className="float-right m-2 h-fit w-fit rounded-full p-2 transition duration-200 hover:bg-gray-200"
-            onClick={() => setEditModal(false)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          <div className="mt-4 flex items-center">
-            <Avatar address={address} />
-            <textarea
-              type="text"
-              rows="1"
-              value={message}
-              maxLength="280"
-              placeholder="Edit your tw33t's message"
-              onChange={(e) => setMessage(e.target.value)}
-              onInput={(e) => {
-                e.target.style.height = "auto"
-                e.target.style.height = e.target.scrollHeight + "px"
-              }}
-              className="mr-4 mb-4 grow resize-none text-xl outline-none"
-            />
-          </div>
-          <div className="mt-auto flex items-center justify-between border-t">
-            <span className="m-3 text-sm text-gray-500">Price: Just gas</span>
-            <div>
-              <span className="text-gray-500">
-                {message ? message.length + "/280" : ""}
-              </span>
-              <button
-                className="button m-3 self-end"
-                onClick={() => sendEdit(props.id)}
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditModal
+          id={props.id}
+          address={address}
+          modal={editModal}
+          setModal={setEditModal}
+          message={message}
+          setMessage={setMessage}
+        />
       )}
     </>
   )

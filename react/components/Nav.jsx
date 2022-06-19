@@ -1,20 +1,10 @@
 import Link from "next/link"
-import Avatar from "./Avatar"
-import { ethers } from "ethers"
+import TweetModal from "./TweetModal"
 import { useState, useEffect } from "react"
-import {
-  useAccount,
-  useContractRead,
-  useContractWrite,
-  UserRejectedRequestError,
-} from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract.js"
-import toast from "react-hot-toast"
+import { useAccount } from "wagmi"
 
 export default function Nav() {
-  const [price, setPrice] = useState(0)
   const [modal, setModal] = useState(false)
-  const [message, setMessage] = useState("")
   const [address, setAddress] = useState("")
 
   const { data: account, refetch: accountRefetch } = useAccount({
@@ -25,71 +15,6 @@ export default function Nav() {
     },
   })
 
-  /**
-   * Contract hooks
-   */
-  useContractRead(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI,
-    },
-    "getPrice",
-    {
-      onSuccess(data) {
-        setPrice(ethers.utils.formatEther(data))
-      },
-    }
-  )
-
-  const { refetch: totalTweetsRefetch } = useContractRead(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI,
-    },
-    "getTotalTweets"
-  )
-
-  const { write: newTweet } = useContractWrite(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI,
-    },
-    "newTweet",
-    {
-      onSuccess(data) {
-        totalTweetsRefetch().then((value) => {
-          toast.success("Sent tweet!")
-          console.debug("Tweeted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
-        })
-      },
-      onError(error) {
-        if (error instanceof UserRejectedRequestError) {
-          toast.error("User rejected transaction")
-          console.error("User rejected transaction")
-        } else {
-          toast.error("Transaction failed")
-          console.error("Transaction failed --", error)
-        }
-      },
-    }
-  )
-
-  /**
-   * Submit a new tweet to the contract
-   */
-  const sendTweet = () => {
-    try {
-      newTweet({
-        args: [message.toString(), 0, 0],
-        overrides: { value: ethers.utils.parseEther(price) },
-      })
-      setModal(false)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   /*
    * On page load, get all existing tweets
    */
@@ -98,12 +23,11 @@ export default function Nav() {
   }, [account, accountRefetch])
 
   return (
-    <nav className="flex min-h-screen w-1/4 flex-col">
+    <nav className="hidden min-h-screen w-1/2 flex-col md:flex lg:w-1/4">
       <Link href="/">
         <a className="ml-1 mt-1 w-min rounded-full p-3 transition duration-200 hover:bg-gray-200">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className=""
             width="32"
             height="32"
             viewBox="0 0 24 24"
@@ -285,64 +209,7 @@ export default function Nav() {
         </span>
       </div>
       {modal && (
-        <div
-          className="fixed inset-0 z-10 bg-gray-500 bg-opacity-50"
-          id="modal-overlay"
-        />
-      )}
-      {modal && (
-        <div
-          className="absolute inset-x-0 top-12 z-20 m-auto w-128 flex-col rounded-xl bg-white"
-          id="tweet-modal"
-        >
-          <button
-            className="float-right m-2 h-fit w-fit rounded-full p-2 transition duration-200 hover:bg-gray-200"
-            onClick={() => setModal(false)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          <div className="mt-4 flex items-center">
-            <Avatar address={address} />
-            <textarea
-              type="text"
-              rows="1"
-              value={message}
-              maxLength="280"
-              placeholder="What's happening? (in web3)"
-              onChange={(e) => setMessage(e.target.value)}
-              onInput={(e) => {
-                e.target.style.height = "auto"
-                e.target.style.height = e.target.scrollHeight + "px"
-              }}
-              className="mr-4 mb-4 grow resize-none text-xl outline-none"
-            />
-          </div>
-          <div className="mt-auto flex items-center justify-between border-t">
-            <span className="m-3 text-sm text-gray-500">Price: {price}Ξ</span>
-            <div>
-              <span className="text-gray-500">
-                {message ? message.length + "/280" : ""}
-              </span>
-              <button className="button m-3 self-end" onClick={sendTweet}>
-                Tw33t
-              </button>
-            </div>
-          </div>
-        </div>
+        <TweetModal address={address} modal={modal} setModal={setModal} />
       )}
     </nav>
   )

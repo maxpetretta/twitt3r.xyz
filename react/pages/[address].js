@@ -1,10 +1,11 @@
-import Link from "next/link"
+import Avatar from "../components/Avatar"
 import Layout from "../components/Layout"
 import TweetList from "../components/TweetList"
+
+import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import { useEnsName, useEnsResolver } from "wagmi"
-import Avatar from "../components/Avatar"
 
 export default function Profile() {
   // const address = "0x983110309620d911731ac0932219af06091b6744"
@@ -82,10 +83,14 @@ export default function Profile() {
               styles="top-0 left-0 z-10 ml-4 block h-32 w-32 rounded-full border-4 border-white"
             />
             <a href={`https://etherscan.io/address/${address}`}>
-              <h1 className="mt-4 text-xl text-black">{ens}</h1>
+              <h1 className="mt-4 truncate text-lg text-black md:text-xl">
+                {ens}
+              </h1>
             </a>
             {name && (
-              <h2 className="text-sm font-normal text-gray-600">{address}</h2>
+              <h2 className="truncate text-sm font-normal text-gray-600">
+                {address}
+              </h2>
             )}
             <p className="mt-4">{description}</p>
           </div>

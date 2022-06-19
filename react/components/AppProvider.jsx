@@ -1,6 +1,6 @@
+import { contractAddress, contractABI } from "../lib/contract.js"
 import { useState, useContext, createContext } from "react"
 import { useContractRead, useContractEvent } from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract.js"
 
 const AppContext = createContext()
 

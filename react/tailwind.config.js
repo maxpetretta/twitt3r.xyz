@@ -2,6 +2,15 @@ module.exports = {
   content: ["./pages/**/*.{js,jsx}", "./components/**/*.{js,jsx}"],
   darkMode: "class",
   theme: {
+    screens: {
+      xs: "370px",
+      ph: "410px",
+      sm: "640px",
+      md: "740px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       colors: {
         twitter: {

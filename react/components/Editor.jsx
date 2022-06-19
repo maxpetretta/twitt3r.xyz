@@ -1,14 +1,17 @@
+import Avatar from "./Avatar.jsx"
+import { contractAddress, contractABI } from "../lib/contract.js"
+
+import Link from "next/link"
+import toast from "react-hot-toast"
 import { ethers } from "ethers"
 import { useState } from "react"
-import toast from "react-hot-toast"
+import { ConnectButton } from "@rainbow-me/rainbowkit"
 import {
   useAccount,
   useContractRead,
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract.js"
-import Avatar from "./Avatar.jsx"
 
 export default function Editor() {
   const [address, setAddress] = useState()
@@ -90,8 +93,33 @@ export default function Editor() {
 
   return (
     <section className="flex flex-col border-b">
-      <h2 className="mt-4 ml-3">Latest Tw33ts</h2>
-      <div className="mt-2 flex items-center">
+      <div className="mb-4 flex items-center justify-between md:mb-0">
+        <div className="flex items-center">
+          <Link href="/">
+            <a className="mt-4 ml-3 block md:hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+              </svg>
+            </a>
+          </Link>
+          <h2 className="mt-4 ml-3 text-lg md:text-xl">Latest Tw33ts</h2>
+        </div>
+        <div className="mt-4 mr-3 block lg:hidden">
+          <ConnectButton chainStatus="none" />
+        </div>
+      </div>
+      <div className="mt-2 hidden items-center md:flex">
         <Avatar address={address} />
         <textarea
           type="text"
@@ -107,7 +135,7 @@ export default function Editor() {
           className="mr-4 grow resize-none text-xl outline-none"
         />
       </div>
-      <div className="ml-3 flex items-center justify-between">
+      <div className="ml-3 hidden items-center justify-between md:flex">
         <span className="mb-3 text-sm text-gray-500">Price: {price}Ξ</span>
         <div>
           <span className="text-gray-500">

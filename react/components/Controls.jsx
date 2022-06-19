@@ -1,3 +1,5 @@
+import { contractAddress, contractABI } from "../lib/contract"
+
 import toast from "react-hot-toast"
 import { ethers } from "ethers"
 import { useState } from "react"
@@ -6,7 +8,6 @@ import {
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract"
 
 export default function Controls() {
   const [price, setPrice] = useState(0)

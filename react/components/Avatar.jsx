@@ -19,8 +19,8 @@ export default function Avatar(props) {
 
   const getColorFromAddress = (address) => {
     const rng = seedrandom(address)
-    const value = Math.floor(rng() * 10)
-    return colors[value]
+    const index = Math.floor(rng() * 10)
+    return colors[index]
   }
 
   /**
