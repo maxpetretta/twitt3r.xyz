@@ -24,7 +24,7 @@ export default function Layout(props) {
   const [modal, setModal] = useState(false)
   const [address, setAddress] = useState("")
   const [isOwner, setIsOwner] = useState(false)
-  const { data: account } = useAccount({
+  useAccount({
     onSuccess(data) {
       if (data) {
         setAddress(data.address)
@@ -33,7 +33,7 @@ export default function Layout(props) {
         // Check if this is the owner's wallet
         if (
           ownerData &&
-          ownerData.toUpperCase() === account.address.toUpperCase()
+          ownerData.toUpperCase() === data.address.toUpperCase()
         ) {
           setIsOwner(true)
         } else {

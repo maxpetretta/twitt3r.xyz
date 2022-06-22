@@ -1,11 +1,23 @@
 import { contractAddress, contractABI } from "../lib/contract.js"
 import { useState, useContext, createContext } from "react"
-import { useContractRead, useContractEvent } from "wagmi"
+import { useAccount, useContractRead, useContractEvent } from "wagmi"
+import toast from "react-hot-toast"
+import { ethers } from "ethers"
+import Confetti from "react-confetti"
 
 const AppContext = createContext()
 
 export const AppProvider = ({ children }) => {
+  const [address, setAddress] = useState()
   const [tweets, setTweets] = useState(new Map())
+  const [confetti, setConfetti] = useState(false)
+  useAccount({
+    onSuccess(data) {
+      if (data) {
+        setAddress(data.address)
+      }
+    },
+  })
 
   /**
    * Contract hooks
@@ -154,8 +166,37 @@ export const AppProvider = ({ children }) => {
     }
   )
 
+  useContractEvent(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "WonLottery",
+    ([winner, jackpot]) => {
+      if (winner === address) {
+        console.debug("WonLottery", winner, jackpot)
+        setConfetti(true)
+        toast(
+          `Congratulations, you won a jackpot of ${ethers.utils.formatEther(
+            jackpot
+          )} ether!`,
+          {
+            duration: 4000,
+            icon: "🎉",
+          }
+        )
+      }
+    }
+  )
+
   return (
     <AppContext.Provider value={{ tweets, setTweets }}>
+      {confetti && (
+        <Confetti
+          recycle={false}
+          onConfettiComplete={() => setConfetti(false)}
+        />
+      )}
       {children}
     </AppContext.Provider>
   )
