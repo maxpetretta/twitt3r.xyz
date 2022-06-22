@@ -1,20 +1,19 @@
-import Avatar from "./Avatar"
-import Address from "./Address"
-import ReplyModal from "./ReplyModal"
-import EditModal from "./EditModal"
-import { useTweets } from "./AppProvider"
-import { contractAddress, contractABI } from "../lib/contract.js"
-
 import dayjs from "dayjs"
-import toast from "react-hot-toast"
-import { useEffect, useState } from "react"
 import { ethers } from "ethers"
+import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 import {
   useAccount,
   useContractRead,
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract.js"
+import Address from "./Address"
+import { useTweets } from "./AppProvider"
+import Avatar from "./Avatar"
+import EditModal from "./EditModal"
+import ReplyModal from "./ReplyModal"
 
 export default function Tweet(props) {
   var relativeTime = require("dayjs/plugin/relativeTime")

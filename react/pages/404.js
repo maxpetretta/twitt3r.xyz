@@ -1,9 +1,8 @@
-import Layout from "../components/Layout"
-
 import Head from "next/head"
 import Link from "next/link"
 import { useState } from "react"
 import { useAccount } from "wagmi"
+import Layout from "../components/Layout"
 
 export default function Error404() {
   const [address, setAddress] = useState("")
@@ -30,7 +29,7 @@ export default function Error404() {
           <h3 className="mt-4">Looks like that page does not exist</h3>
           <p className="mt-4">
             The selected profile does not exist, or you are trying to access a
-            non-existent page. Trying{" "}
+            non-existent page. Try{" "}
             <Link href="/">
               <a>returning home</a>
             </Link>{" "}

@@ -1,17 +1,16 @@
-import Avatar from "./Avatar.jsx"
-import { contractAddress, contractABI } from "../lib/contract.js"
-
-import Link from "next/link"
-import toast from "react-hot-toast"
-import { ethers } from "ethers"
-import { useState } from "react"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
+import { ethers } from "ethers"
+import Link from "next/link"
+import { useState } from "react"
+import toast from "react-hot-toast"
 import {
   useAccount,
   useContractRead,
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract.js"
+import Avatar from "./Avatar.jsx"
 
 export default function Editor() {
   const [address, setAddress] = useState()

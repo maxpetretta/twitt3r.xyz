@@ -1,5 +1,5 @@
-import Tweet from "./Tweet"
 import { useTweets } from "./AppProvider"
+import Tweet from "./Tweet"
 
 export default function TweetList(props) {
   const { tweets } = useTweets()

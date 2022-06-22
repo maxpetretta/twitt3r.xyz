@@ -1,21 +1,20 @@
-import Head from "next/head"
-import { AppProvider } from "../components/AppProvider"
-// import Script from "next/script"
-import { ThemeProvider } from "next-themes"
-import { chain, createClient, configureChains, WagmiConfig } from "wagmi"
-import { infuraProvider } from "wagmi/providers/infura"
-import { publicProvider } from "wagmi/providers/public"
 import {
+  connectorsForWallets,
+  getDefaultWallets,
   // darkTheme,
   lightTheme,
-  getDefaultWallets,
   RainbowKitProvider,
-  connectorsForWallets,
   wallet,
 } from "@rainbow-me/rainbowkit"
-
-import "../styles/globals.css"
 import "@rainbow-me/rainbowkit/styles.css"
+import { AppProvider } from "../components/AppProvider"
+import "../styles/globals.css"
+// import Script from "next/script"
+import { ThemeProvider } from "next-themes"
+import Head from "next/head"
+import { chain, configureChains, createClient, WagmiConfig } from "wagmi"
+import { infuraProvider } from "wagmi/providers/infura"
+import { publicProvider } from "wagmi/providers/public"
 
 const { chains, provider } = configureChains(
   [chain.hardhat, chain.rinkeby, chain.mainnet], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425

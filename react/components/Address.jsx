@@ -24,8 +24,9 @@ export default function Address(props) {
   })
 
   /**
-   * Shorten the given address for readability
-   * @param {string} address - The sender's wallet address
+   * Returns a truncated wallet address
+   * @param {string} address
+   * @returns {string}
    */
   const truncateAddress = (address) => {
     const match = address.match(/^(0x.{4}).+(.{4})$/)

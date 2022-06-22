@@ -1,13 +1,12 @@
+import Head from "next/head"
+import { useRouter } from "next/router"
+import { useState } from "react"
+import { Toaster } from "react-hot-toast"
+import { useAccount, useContractRead } from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract.js"
 import Nav from "./Nav"
 import Sidebar from "./Sidebar"
 import TweetModal from "./TweetModal"
-import { contractAddress, contractABI } from "../lib/contract.js"
-
-import Head from "next/head"
-import { useState } from "react"
-import { useRouter } from "next/router"
-import { Toaster } from "react-hot-toast"
-import { useAccount, useContractRead } from "wagmi"
 
 export default function Layout(props) {
   const { children, ...pageMeta } = props

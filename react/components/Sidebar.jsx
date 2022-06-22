@@ -1,5 +1,5 @@
-import Controls from "./Controls"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
+import Controls from "./Controls"
 
 export default function Sidebar(props) {
   return (

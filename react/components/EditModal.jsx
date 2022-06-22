@@ -1,12 +1,11 @@
-import Avatar from "./Avatar"
-import { contractAddress, contractABI } from "../lib/contract.js"
-
 import toast from "react-hot-toast"
 import {
   useContractRead,
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract.js"
+import Avatar from "./Avatar"
 
 export default function ReplyTweet(props) {
   /**

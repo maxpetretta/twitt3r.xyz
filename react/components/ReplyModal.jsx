@@ -1,16 +1,15 @@
-import Avatar from "./Avatar"
-import Address from "./Address"
-import { contractAddress, contractABI } from "../lib/contract.js"
-
 import dayjs from "dayjs"
-import toast from "react-hot-toast"
 import { ethers } from "ethers"
 import { useState } from "react"
+import toast from "react-hot-toast"
 import {
   useContractRead,
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract.js"
+import Address from "./Address"
+import Avatar from "./Avatar"
 
 export default function ReplyTweet(props) {
   const [price, setPrice] = useState(0)

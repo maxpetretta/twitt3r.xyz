@@ -1,7 +1,7 @@
 import Link from "next/link"
-import TweetModal from "./TweetModal"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useAccount } from "wagmi"
+import TweetModal from "./TweetModal"
 
 export default function Nav() {
   const [modal, setModal] = useState(false)

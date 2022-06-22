@@ -1,11 +1,10 @@
+import Link from "next/link"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { useEnsName, useEnsResolver } from "wagmi"
 import Avatar from "../components/Avatar"
 import Layout from "../components/Layout"
 import TweetList from "../components/TweetList"
-
-import Link from "next/link"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/router"
-import { useEnsName, useEnsResolver } from "wagmi"
 
 export default function Profile() {
   // const address = "0x983110309620d911731ac0932219af06091b6744"
