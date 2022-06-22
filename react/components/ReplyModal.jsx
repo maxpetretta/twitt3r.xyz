@@ -67,7 +67,7 @@ export default function ReplyTweet(props) {
 
   /**
    * Reply to the specified tweet
-   * @param {number} id - The tweet ID number
+   * @param {number} id
    */
   const sendReply = async (id) => {
     try {

@@ -7,7 +7,6 @@ import Layout from "../components/Layout"
 import TweetList from "../components/TweetList"
 
 export default function Profile() {
-  // const address = "0x983110309620d911731ac0932219af06091b6744"
   const router = useRouter()
   const { address: address } = router.query
   const [ens, setEns] = useState(address)
@@ -43,7 +42,7 @@ export default function Profile() {
   })
 
   /**
-   * On page load, fetch the ENS profile description (if exists)
+   * On page load, fetch the ENS profile description (if it exists)
    */
   useEffect(() => {
     setEns(address)

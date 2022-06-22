@@ -17,12 +17,6 @@ export default function Avatar(props) {
     "bg-rose-400",
   ]
 
-  const getColorFromAddress = (address) => {
-    const rng = seedrandom(address)
-    const index = Math.floor(rng() * 10)
-    return colors[index]
-  }
-
   /**
    * Contract hooks
    */
@@ -37,6 +31,17 @@ export default function Avatar(props) {
       console.error("Error fetching ENS", error)
     },
   })
+
+  /**
+   * Returns a random color based on the given address
+   * @param {string} address
+   * @returns {string}
+   */
+  const getColorFromAddress = (address) => {
+    const rng = seedrandom(address)
+    const index = Math.floor(rng() * 10)
+    return colors[index]
+  }
 
   return (
     <>

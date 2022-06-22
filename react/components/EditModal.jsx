@@ -47,7 +47,7 @@ export default function ReplyTweet(props) {
 
   /**
    * Update the specified tweet from the contract
-   * @param {number} id - The tweet ID number
+   * @param {number} id
    */
   const sendEdit = async (id) => {
     try {

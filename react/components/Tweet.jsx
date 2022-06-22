@@ -20,12 +20,12 @@ export default function Tweet(props) {
   dayjs.extend(relativeTime)
 
   const [address, setAddress] = useState()
+  const [price, setPrice] = useState(0)
   const [tweet, setTweet] = useState()
   const [retweet, setRetweet] = useState()
-  const [price, setPrice] = useState(0)
+  const [message, setMessage] = useState("")
   const [replyModal, setReplyModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
-  const [message, setMessage] = useState("")
 
   const { tweets } = useTweets()
   useAccount({
@@ -114,7 +114,7 @@ export default function Tweet(props) {
 
   /**
    * Retweet the specified tweet
-   * @param {number} id - The tweet ID number
+   * @param {number} id
    */
   const sendRetweet = async (id) => {
     try {
@@ -130,7 +130,7 @@ export default function Tweet(props) {
 
   /**
    * Delete the specified tweet from the contract
-   * @param {number} id - The tweet ID number
+   * @param {number} id
    */
   const removeTweet = async (id) => {
     try {
@@ -144,8 +144,9 @@ export default function Tweet(props) {
   }
 
   /**
-   * Filter for all replies to a tweet
+   * Filter for all replies to a specified tweet
    * @param {number} id
+   * @returns {Array}
    */
   const getReplies = (id) => {
     let replies = [...tweets.entries()].filter(
@@ -155,7 +156,7 @@ export default function Tweet(props) {
   }
 
   /*
-   * On page load, get the relevant tweet
+   * On page load, get the relevant tweet or retweet
    */
   useEffect(() => {
     if (tweets.get(props.id).retweetID.isZero()) {

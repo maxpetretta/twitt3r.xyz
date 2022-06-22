@@ -1,26 +1,18 @@
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useAccount } from "wagmi"
 import TweetModal from "./TweetModal"
 
 export default function Nav() {
   const [modal, setModal] = useState(false)
   const [address, setAddress] = useState("")
-
-  const { data: account, refetch: accountRefetch } = useAccount({
+  useAccount({
     onSuccess(data) {
       if (data) {
         setAddress(data.address)
       }
     },
   })
-
-  /*
-   * On page load, get all existing tweets
-   */
-  useEffect(() => {
-    accountRefetch()
-  }, [account, accountRefetch])
 
   return (
     <nav className="hidden min-h-screen w-1/2 flex-col md:flex lg:w-1/4">

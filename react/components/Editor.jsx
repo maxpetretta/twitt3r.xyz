@@ -16,7 +16,6 @@ export default function Editor() {
   const [address, setAddress] = useState()
   const [message, setMessage] = useState("")
   const [price, setPrice] = useState(0)
-
   useAccount({
     onSuccess(data) {
       if (data) {

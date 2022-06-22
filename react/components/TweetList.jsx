@@ -5,7 +5,8 @@ export default function TweetList(props) {
   const { tweets } = useTweets()
 
   /**
-   * Filter all tweets using the selected address
+   * Filter for all tweets from the specified address
+   * @returns {Array}
    */
   const getAuthorTweets = () => {
     let filtered = [...tweets.entries()].filter(
@@ -20,6 +21,7 @@ export default function TweetList(props) {
   /**
    * Filter for all replies to a tweet
    * @param {number} id
+   * @returns {Array}
    */
   const getReplies = (id) => {
     let replies = [...tweets.entries()].filter(

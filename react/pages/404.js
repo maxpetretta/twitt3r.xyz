@@ -5,14 +5,11 @@ import { useAccount } from "wagmi"
 import Layout from "../components/Layout"
 
 export default function Error404() {
-  const [address, setAddress] = useState("")
+  const [address, setAddress] = useState()
   useAccount({
     onSuccess(data) {
       if (data) {
-        console.debug("Found authorized account: ", data.address)
         setAddress(data.address)
-      } else {
-        console.debug("No authorized account found")
       }
     },
   })

@@ -168,7 +168,7 @@ export default function Controls() {
 
   /**
    * Update the setting parameters (price, odds, jackpot) , only for the owner
-   * @param {*} event - POST event from the form
+   * @param {Object} event
    */
   const updateContractSettings = async (event) => {
     try {
