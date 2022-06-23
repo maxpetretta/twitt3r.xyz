@@ -1,20 +1,18 @@
 import {
   connectorsForWallets,
   getDefaultWallets,
-  // darkTheme,
   lightTheme,
   RainbowKitProvider,
   wallet,
 } from "@rainbow-me/rainbowkit"
 import "@rainbow-me/rainbowkit/styles.css"
-import { AppProvider } from "../components/AppProvider"
-import "../styles/globals.css"
-// import Script from "next/script"
-import { ThemeProvider } from "next-themes"
 import Head from "next/head"
+import Script from "next/script"
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi"
 import { infuraProvider } from "wagmi/providers/infura"
 import { publicProvider } from "wagmi/providers/public"
+import { AppProvider } from "../components/AppProvider"
+import "../styles/globals.css"
 
 const { chains, provider } = configureChains(
   [chain.hardhat, chain.rinkeby, chain.mainnet], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
@@ -78,29 +76,27 @@ export default function App({ Component, pageProps }) {
         <meta name="msapplication-TileColor" content="#c73156" />
         <meta name="theme-color" content="#111827" />
         {/* Preconnects */}
-        {/* <link rel="preconnect" href="https://vitals.vercel-insights.com" />
+        <link rel="preconnect" href="https://vitals.vercel-insights.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.google-analytics.com" /> */}
+        <link rel="preconnect" href="https://www.google-analytics.com" />
       </Head>
-      <ThemeProvider attribute="class" forcedTheme="light">
-        <WagmiConfig client={wagmiClient}>
-          <RainbowKitProvider
-            theme={lightTheme({
-              accentColor: "#e73e83",
-              accentColorForeground: "white",
-              borderRadius: "large",
-              fontStack: "system",
-            })}
-            chains={chains}
-            coolMode
-          >
-            <AppProvider>
-              <Component {...pageProps} />
-            </AppProvider>
-          </RainbowKitProvider>
-        </WagmiConfig>
-      </ThemeProvider>
-      {/* <Script
+      <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider
+          theme={lightTheme({
+            accentColor: "#e73e83",
+            accentColorForeground: "white",
+            borderRadius: "large",
+            fontStack: "system",
+          })}
+          chains={chains}
+          coolMode
+        >
+          <AppProvider>
+            <Component {...pageProps} />
+          </AppProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
+      <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
       />
       <Script id="gtag">
@@ -112,7 +108,7 @@ export default function App({ Component, pageProps }) {
             page_path: window.location.pathname,
           });
         `}
-      </Script> */}
+      </Script>
     </>
   )
 }
