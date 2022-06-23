@@ -1,43 +1,61 @@
 import { ethers } from "ethers"
-import { useState, useEffect } from "react"
-import { useAccount, useContractRead, useContractWrite } from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract"
+import { useState } from "react"
+import toast from "react-hot-toast"
+import {
+  useContractRead,
+  useContractWrite,
+  UserRejectedRequestError,
+} from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract"
 
-export default function Controls(props) {
+export default function Controls() {
   const [price, setPrice] = useState(0)
   const [odds, setOdds] = useState(0)
   const [jackpot, setJackpot] = useState(0)
 
-  const { data: account } = useAccount()
-
   /**
    * Contract hooks
    */
-  const { data: priceData, error: priceError, refetch: priceRefetch } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getPrice"
+    "getPrice",
+    {
+      onSuccess(data) {
+        setPrice(ethers.utils.formatEther(data))
+      },
+    }
   )
 
-  const { data: oddsData, error: oddsError, refetch: oddsRefetch } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getOdds"
+    "getOdds",
+    {
+      onSuccess(data) {
+        setOdds(ethers.utils.formatUnits(data, 0))
+      },
+    }
   )
 
-  const { data: jackpotData, error: jackpotError, refetch: jackpotRefetch } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getJackpot"
+    "getJackpot",
+    {
+      onSuccess(data) {
+        setJackpot(ethers.utils.formatEther(data))
+      },
+    }
   )
 
-  const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
+  const { refetch: totalTweetsRefetch } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -45,7 +63,7 @@ export default function Controls(props) {
     "getTotalTweets"
   )
 
-  const { data: isPausedData, error: isPausedError, refetch: isPausedRefetch } = useContractRead(
+  const { data: isPausedData } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -53,7 +71,7 @@ export default function Controls(props) {
     "isPaused"
   )
 
-  const { data: settingsData, error: settingsError, write: updateSettings } = useContractWrite(
+  const { write: updateSettings } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -61,15 +79,22 @@ export default function Controls(props) {
     "updateSettings",
     {
       onSuccess(data) {
+        toast.success("Updated settings")
         console.debug("Updated settings --", data.hash)
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
-      }
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
+      },
     }
   )
 
-  const { data: clearData, error: clearError, write: clear } = useContractWrite(
+  const { write: clear } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -77,18 +102,25 @@ export default function Controls(props) {
     "clear",
     {
       onSuccess(data) {
+        toast.success("Cleared tweets")
         console.debug("Cleared --", data.hash)
         totalTweetsRefetch().then((value) => {
-          console.debug("Retrieved total tweet count --", value.data.toNumber())  
+          console.debug("Retrieved total tweet count --", value.data.toNumber())
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
-      }
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
+      },
     }
   )
 
-  const { data: pauseData, error: pauseError, write: pause } = useContractWrite(
+  const { write: pause } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -96,40 +128,47 @@ export default function Controls(props) {
     "pause",
     {
       onSuccess(data) {
-        let status
-        isPausedRefetch().then((value) => {
-          status = value.data ? "Unpaused" : "Paused"
-          console.debug(status, "--", data.hash)
-        })
+        toast.success("Paused contract")
+        console.debug("Paused --", data.hash)
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
-      }
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
+      },
+    }
+  )
+
+  const { write: unpause } = useContractWrite(
+    {
+      addressOrName: contractAddress,
+      contractInterface: contractABI,
+    },
+    "unpause",
+    {
+      onSuccess(data) {
+        toast.success("Unpaused contract")
+        console.debug("Unpaused --", data.hash)
+      },
+      onError(error) {
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
+      },
     }
   )
 
   /**
-   * Read the settings values from the contract, and set them in state
-   */
-  const getSettings = async () => {
-    try {
-      priceRefetch().then((value) => {
-        setPrice(ethers.utils.formatEther(value.data))
-      })
-      oddsRefetch().then((value) => {
-        setOdds(ethers.utils.formatUnits(value.data, 0))
-      })
-      jackpotRefetch().then((value) => {
-        setJackpot(ethers.utils.formatEther(value.data))
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  /**
    * Update the setting parameters (price, odds, jackpot) , only for the owner
-   * @param {*} event - POST event from the form
+   * @param {Object} event
    */
   const updateContractSettings = async (event) => {
     try {
@@ -140,10 +179,11 @@ export default function Controls(props) {
           ethers.utils.parseEther(event.target.price.value),
           event.target.odds.value,
           ethers.utils.parseEther(event.target.jackpot.value),
-        ]
+        ],
       })
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction error")
+      console.error("Transaction error --", error)
     }
   }
 
@@ -154,7 +194,8 @@ export default function Controls(props) {
     try {
       clear()
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction error")
+      console.error("Transaction error --", error)
     }
   }
 
@@ -163,79 +204,81 @@ export default function Controls(props) {
    */
   const pauseContract = () => {
     try {
-      console.debug("Checked contract status, pause =", isPausedData.toString())
-  
-      pause({
-        args: [!isPausedData]
-      })
+      if (isPausedData) {
+        unpause()
+      } else {
+        pause()
+      }
     } catch (error) {
-      console.error(error)
+      toast.error("Transaction error")
+      console.error("Transaction error --", error)
     }
   }
 
-  /**
-   * On page load, get the current contract settings
-   */
-  useEffect(() => {
-    if (account) {
-      getSettings()
-    }
-
-    // Cleanup function for settings
-    return () => {
-      setPrice(price)
-      setOdds(odds)
-      setJackpot(jackpot)
-    }
-  }, [account])
-
   return (
-    <section>
+    <section className="m-3 rounded-xl bg-gray-100 p-3">
       <h3>Contract Settings</h3>
-      <p>Welcome, owner! You may modify the contract settings below:</p>
+      <p className="mt-1">
+        Welcome, owner! You may modify the contract settings below:
+      </p>
       <form onSubmit={updateContractSettings}>
-        <div>
-          <label>Tw33t Price:</label>
+        <div className="mt-3 flex">
+          <label>Price:</label>
           <input
             id="price"
             type="number"
             step="any"
             value={price}
-            onChange={e => setPrice(e.target.value)}
+            onChange={(e) => setPrice(e.target.value)}
             placeholder="Price in Ether"
+            className="w-full bg-gray-100 text-right"
             required
           />
           <span>Ξ</span>
-          <label>Lottery Odds:</label>
+        </div>
+        <div className="mt-1 flex">
+          <label>Odds:</label>
           <input
             id="odds"
             type="number"
             value={odds}
-            onChange={e => setOdds(e.target.value)}
-            placeholder="0 - 100%"
+            onChange={(e) => setOdds(e.target.value)}
+            placeholder="0 - 100"
+            className="w-full bg-gray-100 text-right"
             required
           />
           <span>%</span>
-          <label>Lottery Jackpot:</label>
+        </div>
+        <div className="mt-1 flex">
+          <label>Jackpot:</label>
           <input
             id="jackpot"
             type="number"
             step="any"
             value={jackpot}
-            onChange={e => setJackpot(e.target.value)}
+            onChange={(e) => setJackpot(e.target.value)}
             placeholder="Prize in Ether"
+            className="w-full bg-gray-100 text-right"
             required
           />
           <span>Ξ</span>
         </div>
-        <div>
-          <button type="button" onClick={clearTweets}>
-            Clear All Tweets
-          </button>
-          <button type="button" onClick={pauseContract}>
+        <div className="mt-6 flex flex-col">
+          <button className="button mx-6">Submit Changes</button>
+          <button
+            className="button mx-6 mt-3"
+            type="button"
+            onClick={pauseContract}
+          >
             Pause Contract
           </button>
-          <button>Submit Changes</button>
+          <button
+            className="button mx-6 mt-3"
+            type="button"
+            onClick={clearTweets}
+          >
+            Clear All Tw33ts
+          </button>
         </div>
       </form>
     </section>

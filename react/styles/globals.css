@@ -3,4 +3,42 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    /* @apply bg-gray-900; */
+  }
+  a {
+    @apply text-twitter-blue hover:underline;
+  }
+  h1 {
+    @apply text-2xl font-bold;
+  }
+  h2 {
+    @apply text-xl font-bold;
+  }
+  h3 {
+    @apply text-lg font-semibold;
+  }
+  h4 {
+    @apply text-base;
+  }
+}
+
+@layer components {
+  .button {
+    @apply transform cursor-pointer rounded-full bg-twitter-blue px-5 py-2 font-bold text-white transition duration-200 hover:scale-105 focus:scale-105;
+  }
+  .no-link {
+    @apply text-black hover:no-underline;
+  }
+}
+
+@layer utilities {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }

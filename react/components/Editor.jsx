@@ -1,22 +1,46 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit"
+import { ethers } from "ethers"
+import Link from "next/link"
 import { useState } from "react"
-import { useContractRead, useContractWrite } from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract.js"
+import toast from "react-hot-toast"
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  UserRejectedRequestError,
+} from "wagmi"
+import { contractABI, contractAddress } from "../lib/contract.js"
+import Avatar from "./Avatar.jsx"
 
-export default function Editor(props) {
+export default function Editor() {
+  const [address, setAddress] = useState()
   const [message, setMessage] = useState("")
+  const [price, setPrice] = useState(0)
+  useAccount({
+    onSuccess(data) {
+      if (data) {
+        setAddress(data.address)
+      }
+    },
+  })
 
   /**
    * Contract hooks
    */
-   const { data: priceData, error: priceError, refetch: priceRefetch } = useContractRead(
+  useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
     },
-    "getPrice"
+    "getPrice",
+    {
+      onSuccess(data) {
+        setPrice(ethers.utils.formatEther(data))
+      },
+    }
   )
 
-   const { data: totalTweetsData, error: totalTweetsError, refetch: totalTweetsRefetch } = useContractRead(
+  const { refetch: totalTweetsRefetch } = useContractRead(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -24,7 +48,7 @@ export default function Editor(props) {
     "getTotalTweets"
   )
 
-   const { data: tweetData, error: tweetError, write: newTweet } = useContractWrite(
+  const { write: newTweet } = useContractWrite(
     {
       addressOrName: contractAddress,
       contractInterface: contractABI,
@@ -33,42 +57,93 @@ export default function Editor(props) {
     {
       onSuccess(data) {
         totalTweetsRefetch().then((value) => {
+          toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
           console.debug("Retrieved total tweet count --", value.data.toNumber())
         })
       },
       onError(error) {
-        console.error("Transaction failed -- ", error)
-      }
+        if (error instanceof UserRejectedRequestError) {
+          toast.error("User rejected transaction")
+          console.error("User rejected transaction")
+        } else {
+          toast.error("Transaction failed")
+          console.error("Transaction failed --", error)
+        }
+      },
     }
   )
 
   /**
    * Submit a new tweet to the contract
    */
-  const sendTweet = async () => {
+  const sendTweet = () => {
     try {
-      priceRefetch().then((value) => {
-        newTweet({
-          args: message.toString(),
-          overrides: { value: value.data }
-        })
+      newTweet({
+        args: [message.toString(), 0, 0],
+        overrides: { value: ethers.utils.parseEther(price) },
       })
     } catch (error) {
-      console.error(error)
+      toast.error("Please wait 1 minute before tweeting again!")
+      console.error("Transaction failed --", error)
     }
   }
 
   return (
-    <section>
-      <label>Tw33t Editor</label>
-      <input
-        type="text"
-        value={message}
-        placeholder="What's happening?"
-        onChange={(e) => setMessage(e.target.value)}
-      />
-      <button onClick={sendTweet}>Tw33t</button>
+    <section className="flex flex-col border-b">
+      <div className="mb-4 flex items-center justify-between md:mb-0">
+        <div className="flex items-center">
+          <Link href="/">
+            <a className="mt-4 ml-3 block md:hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                fill="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+              </svg>
+            </a>
+          </Link>
+          <h2 className="mt-4 ml-3 text-lg md:text-xl">Latest Tw33ts</h2>
+        </div>
+        <div className="mt-4 mr-3 block lg:hidden">
+          <ConnectButton chainStatus="none" />
+        </div>
+      </div>
+      <div className="mt-2 hidden items-center md:flex">
+        <Avatar address={address} />
+        <textarea
+          type="text"
+          rows="1"
+          value={message}
+          maxLength="280"
+          placeholder="What's happening? (in web3)"
+          onChange={(e) => setMessage(e.target.value)}
+          onInput={(e) => {
+            e.target.style.height = "auto"
+            e.target.style.height = e.target.scrollHeight + "px"
+          }}
+          className="mr-4 grow resize-none text-xl outline-none"
+        />
+      </div>
+      <div className="ml-3 hidden items-center justify-between md:flex">
+        <span className="mb-3 text-sm text-gray-500">Price: {price}Ξ</span>
+        <div>
+          <span className="text-gray-500">
+            {message ? message.length + "/280" : ""}
+          </span>
+          <button className="button mx-3 mb-3 self-end" onClick={sendTweet}>
+            Tw33t
+          </button>
+        </div>
+      </div>
     </section>
   )
 }

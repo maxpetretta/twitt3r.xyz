@@ -1,79 +1,45 @@
+import { useTweets } from "./AppProvider"
 import Tweet from "./Tweet"
 
-import { useState } from "react"
-import { useContractEvent } from "wagmi"
-import { contractAddress, contractABI } from "../lib/contract.js"
-
 export default function TweetList(props) {
-  const [tweets, setTweets] = useState(new Map())
+  const { tweets } = useTweets()
 
   /**
-   * Contract hooks
+   * Filter for all tweets from the specified address
+   * @returns {Array}
    */
-  useContractEvent(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI
-    },
-    "NewTweet",
-    ([id, from, timestamp, message]) => {
-      console.debug("NewTweet", id.toNumber(), from, new Date(timestamp * 1000), message)
-    
-      setTweets((prevState) => {
-        let newState = new Map(prevState)
-        newState.set(id.toNumber(), {from: from, timestamp: new Date(timestamp * 1000), message: message})
-        return newState
-      })
+  const getAuthorTweets = () => {
+    let filtered = [...tweets.entries()].filter(
+      (tweet) => tweet[1].replyID.eq(0) && !tweet[1].deleted
+    )
+    if (props.author) {
+      filtered = filtered.filter((tweet) => tweet[1].from == props.author)
     }
-  )
+    return filtered
+  }
 
-  useContractEvent(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI
-    },
-    "EditTweet",
-    ([id, from, timestamp, message]) => {
-      console.debug("EditTweet", id.toNumber(), from, new Date(timestamp * 1000), message)
-    
-      setTweets((prevState) => {
-        let newState = new Map(prevState)
-        newState.set(id.toNumber(), {from: from, timestamp: new Date(timestamp * 1000), message: message})
-        return newState
-      })
-    }
-  )
-
-  useContractEvent(
-    {
-      addressOrName: contractAddress,
-      contractInterface: contractABI
-    },
-    "DeleteTweet",
-    ([id, from, timestamp, message]) => {
-      console.debug("DeleteTweet", id.toNumber(), from, new Date(timestamp * 1000), message)
-    
-      setTweets((prevState) => {
-        let newState = new Map(prevState)
-        newState.delete(id.toNumber())
-        return newState
-      })
-    }
-  )
+  /**
+   * Filter for all replies to a tweet
+   * @param {number} id
+   * @returns {Array}
+   */
+  const getReplies = (id) => {
+    let replies = [...tweets.entries()].filter(
+      (tweet) => tweet[1].replyID.eq(id) && !tweet[1].deleted
+    )
+    return replies
+  }
 
   return (
     <section>
-      <p>test</p>
-      {Array.from(tweets, ([id, tweet]) => {
-        console.log("here")
+      {Array.from(getAuthorTweets(), ([id]) => {
+        const replies = getReplies(id)
         return (
-          <Tweet
-            id={id}
-            key={id}
-            tweet={tweet}
-          />
+          <div key={id} className="border-b">
+            <Tweet id={id} key={id} replies={replies} />
+          </div>
         )
-      })}
+      }).reverse()}
     </section>
   )
 }

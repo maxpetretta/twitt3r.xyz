@@ -3,15 +3,15 @@
   "license": "MIT",
   "main": "run.js",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.2",
-    "dotenv": "^10.0.0"
+    "@openzeppelin/contracts": "^4.6.0",
+    "dotenv": "^16.0.1"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "chai": "^4.3.4",
-    "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.7",
-    "hardhat": "^2.6.6"
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.8",
+    "hardhat": "^2.9.7"
   }
 }
