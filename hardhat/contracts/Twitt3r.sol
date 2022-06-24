@@ -5,10 +5,16 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "hardhat/console.sol"; // DEBUG
 
+/**
+ * @title Twitt3r
+ * @author Max Petretta (maxpetretta.eth)
+ * @notice A decentralized version of Twitter, build on the Ethereum blockchain
+ * @dev Not audited!
+ */
 contract Twitt3r is Ownable, Pausable {
-  uint256 public price = 0.0001 ether;
-  uint256 public jackpot = 0.001 ether;
-  uint256 public odds = 10;
+  uint8 public odds;
+  uint256 public price;
+  uint256 public jackpot;
   address public lastWinner;
   uint256 private seed;
   
@@ -33,20 +39,38 @@ contract Twitt3r is Ownable, Pausable {
   event ClearTweets(uint256 id);
   event WonLottery(address winner, uint256 jackpot);
 
-  constructor() payable {
-    // tweet("Hello World!");
+  /**
+   * @notice Deploys the Twitt3r contract with the given settings
+   * @param _odds The percentage (0 - 100) chance of a jackpot payout
+   * @param _price The price to send a tweet
+   * @param _jackpot The value of the jackpot to pay out
+   */
+  constructor(uint8 _odds, uint256 _price, uint256 _jackpot) payable {
+    odds = _odds;
+    price = _price;
+    jackpot = _jackpot;
   }
 
-  // Manage the contract's balance
+  /**
+   * @notice Deposit into the contract to refill for jackpot payouts
+   */
   function deposit() public payable {}
 
+  /**
+   * @notice In case of emergency, the owner can withdraw from the contract
+   */
   function withdraw() public onlyOwner {
     uint256 amount = address(this).balance;
     (bool sent, ) = owner().call{value: amount}("");
     require(sent, "Failed to withdraw from contract");
   }
 
-  // Send a message (tweet) using the contract
+  /**
+   * @notice Send a message (tweet) to the contract
+   * @param _message The sender's message to post
+   * @param _replyID The ID of the tweet being replied to, 0 for top-level tweets
+   * @param _retweetID The ID of the tweet being resent, 0 for top-level tweets
+   */
   function newTweet(string memory _message, uint256 _replyID, uint256 _retweetID) public payable whenNotPaused {
     require(msg.value >= price, "Amount sent is incorrect");
     require(bytes(_message).length <= 280, "Limit is 280 characters!");
@@ -65,7 +89,11 @@ contract Twitt3r is Ownable, Pausable {
     id++;
   }
 
-  // Edit an existing tweet's message
+  /**
+   * @notice Edit an existing tweet's message
+   * @param _id The ID of the tweet being edited
+   * @param _message The new replacement message for the specified tweet
+   */
   function editTweet(uint256 _id, string memory _message) public whenNotPaused {
     require(tweets[_id].timestamp != 0, "Given ID is invalid");
     require(!tweets[_id].deleted, "Given tweet is deleted!");
@@ -76,7 +104,10 @@ contract Twitt3r is Ownable, Pausable {
     emit EditTweet(_id, msg.sender, block.timestamp, tweets[_id].message, tweets[_id].deleted, tweets[_id].replyID, tweets[_id].retweetID);
   }
 
-  // Delete a tweet from the contract
+  /**
+   * @notice Delete a tweet from the contract
+   * @param _id The ID of the tweet to delete
+   */
   function deleteTweet(uint256 _id) public whenNotPaused {
     require(tweets[_id].timestamp != 0, "Given ID is invalid");
     require(!tweets[_id].deleted, "Given tweet is already deleted!");
@@ -86,7 +117,9 @@ contract Twitt3r is Ownable, Pausable {
     emit DeleteTweet(_id, msg.sender, block.timestamp, tweets[_id].message, tweets[_id].deleted, tweets[_id].replyID, tweets[_id].retweetID);
   }
 
-  // Manage the contract's state
+  /**
+   * @notice In case of emergency, the owner can clear all tweets from the contract
+   */
   function clear() public onlyOwner {
     uint256 lastID = id;
     for (uint256 i = 0; i < tweetIDs.length; i++) {
@@ -98,49 +131,92 @@ contract Twitt3r is Ownable, Pausable {
     emit ClearTweets(lastID);
   }
 
+  /**
+   * @notice Allow the owner to pause tweeting functions
+   */
   function pause() public onlyOwner {
     _pause();
   }
 
+  /**
+   * @notice Allow the owner to unpause tweeting functions
+   */
   function unpause() public onlyOwner {
     _unpause();
   }
 
-  function updateSettings(uint256 _newPrice, uint256 _newOdds, uint256 _newJackpot) public onlyOwner {
-    setPrice(_newPrice);
+  /**
+   * @notice Allow the owner to update the contract's settings
+   * @param _odds The new percentage (0 - 100) chance of a jackpot payout
+   * @param _price The new price to send a tweet
+   * @param _jackpot The new value of the jackpot to pay out
+   */
+  function updateSettings(uint8 _odds, uint256 _price, uint256 _jackpot) public onlyOwner {
     setOdds(_newOdds);
+    setPrice(_newPrice);
     setJackpot(_newJackpot);
   }
 
-  // Retrieve contract metadata
+  /**
+   * @notice Check if the contract is paused
+   * @return bool true if the contract is paused, false otherwise 
+   */
   function isPaused() public view returns (bool) {
     return paused();
   }
 
+  /**
+   * @notice Get the contract owner's address
+   * @return address The contract owner
+   */
   function getOwner() public view returns (address) {
     return owner();
   }
 
+  /**
+   * @notice Get the balance of the contract
+   * @return uint256 The current address of the contract
+   */
   function getBalance() public view returns (uint256) {
     return address(this).balance;
   }
 
+  /**
+   * @notice Get the odds of winning the jackpot
+   * @return uint8 The current odds of a jackpot payout
+   */
+  function getOdds() public view returns (uint8) {
+    return odds;
+  }
+
+  /**
+   * @notice Get the price of sending a new tweet
+   * @return uint256 The current price of sending a tweet
+   */
   function getPrice() public view returns (uint256) {
     return price;
   }
 
-  function getOdds() public view returns (uint256) {
-    return odds;
-  }
-
+  /**
+   * @notice Get the jackpot payout value
+   * @return uint256 The current jackpot payout amount
+   */
   function getJackpot() public view returns (uint256) {
     return jackpot;
   }
-  
+
+  /**
+   * @notice Get the last winner's address
+   * @return address The last winner's wallet address
+   */
   function getLastWinner() public view returns (address) {
     return lastWinner;
   }
 
+  /**
+   * @notice Get all sent tweets from the contract
+   * @return Tweet[] An array of all tweets stored on the contract
+   */
   function getTweets() public view returns (Tweet[] memory) {
     Tweet[] memory allTweets = new Tweet[](tweetIDs.length);
     for (uint256 i = 0; i < tweetIDs.length; i++) {
@@ -149,23 +225,43 @@ contract Twitt3r is Ownable, Pausable {
     return allTweets;
   }
 
+  /**
+   * @notice Get the total number of tweets sent
+   * @return uint256 The current total number of tweets
+   */
   function getTotalTweets() public view returns (uint256) {
     return tweetIDs.length;
   }
 
-  function setPrice(uint256 _newPrice) internal {
-    price = _newPrice;
+  /**
+   * @notice Set the odds of winning a jackpot 
+   * @param _odds The new percent odds of winning
+   */
+  function setOdds(uint256 _odds) internal {
+    odds = _odds;
   }
 
-  function setOdds(uint256 _newOdds) internal {
-    odds = _newOdds;
+  /**
+   * @notice Set the price of sending a tweet
+   * @param _price The new price of sending a tweet
+   */
+  function setPrice(uint256 _price) internal {
+    price = _price;
   }
 
-  function setJackpot(uint256 _newJackpot) internal {
-    jackpot = _newJackpot;
+  /**
+   * @notice Set the jackpot payout amount
+   * @param _jackpot The new value of winning a jackpot
+   */
+  function setJackpot(uint256 _jackpot) internal {
+    jackpot = _jackpot;
   }
 
-  // Randomly award a sender with the jackpot, at the set odds
+  /**
+   * @notice Check whether the last sender won the lottery, based on the set odds
+   * @dev Uses a simple RNG method based on block difficulty and timestamp, could be improved
+   * @param _sender The most recent tweet sender
+   */
   function checkLottery(address payable _sender) private {
     require(address(this).balance >= jackpot, "Contract balance is insufficient!");
     uint256 randomNumber = (block.difficulty + block.timestamp + seed) % 100;
