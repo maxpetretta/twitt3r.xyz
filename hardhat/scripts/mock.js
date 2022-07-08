@@ -10,6 +10,9 @@ const main = async () => {
   const network = hre.network.name
   const options = { value: hre.ethers.utils.parseEther("0.001") }
 
+  const messages = ["gm", "Hello Twitt3r!", "Wen merge", "web3 is so cool!", "Ethereum is the future", "Who's in NYC?", "How is this website free 😂", "Alright, time for a thread 🧵:"]
+  const replies = ["gm", "This is the way", "To the moon!", "iAintReadingAllThat.jpg", "Brutal", "Let's goooo", "Soon™️", "DM me", "Rugged again 😭", "🔥", "🫡"]
+
   // Exit early if not on localhost
   if (network != "localhost") {
     console.log("Mock script can only be ran on localhost!")
@@ -19,6 +22,9 @@ const main = async () => {
   console.log("Selected network:", network)
   console.log("Deploying contract with account:", owner.address)
   console.log("Account balance:", hre.ethers.utils.formatEther(balance))
+
+  console.log("\nDeploying in 5 seconds...")
+  await sleep(5000)
 
   const contract = await hre.ethers.getContractFactory("Twitt3r")
   const twitt3r = await contract.deploy(
@@ -44,11 +50,11 @@ const main = async () => {
     
     switch(rng(0, 3)) {
       case 0: // Top-level tweet
-        txn = await twitt3r.connect(account).newTweet("Tweet", 0, 0, options)
+        txn = await twitt3r.connect(account).newTweet(messages[rng(0, messages.length)], 0, 0, options)
         await txn.wait()
         break
       case 1: // Reply tweet
-        txn = await twitt3r.connect(account).newTweet("Reply", rng(1, id + 1), 0, options)
+        txn = await twitt3r.connect(account).newTweet(replies[rng(0, replies.length)], rng(1, id + 1), 0, options)
         await txn.wait()
         break
       case 2: // Retweet
@@ -82,8 +88,8 @@ const main = async () => {
   const count = await twitt3r.getTotalTweets()
   console.log("Total tweets sent:", count.toNumber())
 
-  // const tweets = await twitt3r.getTweets()
-  // console.log("\n----- Sent Tweets -----\n", tweets)
+  const tweets = await twitt3r.getTweets()
+  console.log("\n----- Sent Tweets -----\n", tweets)
 }
 
 /**

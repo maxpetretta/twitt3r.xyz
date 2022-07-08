@@ -13,7 +13,7 @@ export default function Avatar(props) {
     "bg-sky-400",
     "bg-indigo-400",
     "bg-purple-400",
-    "bg-fushsia-400",
+    "bg-fuchsia-400",
     "bg-rose-400",
   ]
 
