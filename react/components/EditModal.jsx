@@ -37,8 +37,11 @@ export default function ReplyTweet(props) {
         if (error instanceof UserRejectedRequestError) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
-        } else {
+        } else if (error.message.includes("Unauthorized()")) {
           toast.error("You are not the author!")
+          console.error("Unauthorized --", error)
+        } else {
+          toast.error("Transaction failed")
           console.error("Transaction failed --", error)
         }
       },
@@ -56,7 +59,7 @@ export default function ReplyTweet(props) {
       })
       props.setModal(false)
     } catch (error) {
-      toast.error("Please wait 1 minute before tweeting again!")
+      toast.error("Transaction failed")
       console.error("Transaction failed --", error)
     }
   }

@@ -57,6 +57,9 @@ export default function ReplyTweet(props) {
         if (error instanceof UserRejectedRequestError) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
+        } else if (error.message.includes("SenderCooldown()")) {
+          toast.error("Please wait 1 minute before tweeting again!")
+          console.error("SenderCooldown --", error)
         } else {
           toast.error("Transaction failed")
           console.error("Transaction failed --", error)
@@ -77,7 +80,7 @@ export default function ReplyTweet(props) {
       })
       props.setModal(false)
     } catch (error) {
-      toast.error("Please wait 1 minute before tweeting again!")
+      toast.error("Transaction failed")
       console.error("Transaction failed --", error)
     }
   }
