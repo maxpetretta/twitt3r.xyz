@@ -214,6 +214,12 @@ describe("Twitt3r contract", function () {
   })
 
   describe("Lottery payout", function () {
+    it("Should allow anyone to deposit into the contract", async function () {
+      const { twitt3r, owner } = await loadFixture(twitt3rFixture)
+      await twitt3r.connect(owner).deposit({ value: hre.ethers.utils.parseEther("1.0") })
+      expect(await twitt3r.getBalance()).to.equal(hre.ethers.utils.parseEther("2.0"))
+    })
+
     it("Should pay out a lottery to a winning user", async function () {
       const { twitt3r, owner, price } = await loadFixture(twitt3rFixture)
       await twitt3r.connect(owner).updateSettings(100, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("1.0"))
