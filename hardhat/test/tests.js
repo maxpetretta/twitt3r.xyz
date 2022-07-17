@@ -15,8 +15,8 @@ describe("Twitt3r contract", function () {
     const twitt3r = await contract.deploy(
       1, // Odds
       hre.ethers.utils.parseEther("0.001"), // Price
-      hre.ethers.utils.parseEther("1.0"), // Jackpot
-      { value: hre.ethers.utils.parseEther("1.0") } // Initial contract balance, for paying out awards
+      hre.ethers.utils.parseEther("0.1"), // Jackpot
+      { value: hre.ethers.utils.parseEther("0.2") } // Initial contract balance, for paying out awards
     )
   
     await twitt3r.deployed()
@@ -31,7 +31,7 @@ describe("Twitt3r contract", function () {
 
     it("Should receive the right initial amount of Ether", async function() {
       const { twitt3r } = await loadFixture(twitt3rFixture)
-      expect(await twitt3r.getBalance()).to.equal(hre.ethers.utils.parseEther("1.0"))
+      expect(await twitt3r.getBalance()).to.equal(hre.ethers.utils.parseEther("0.2"))
     })
 
     it("Should set the right price to tweet", async function () {
@@ -41,7 +41,7 @@ describe("Twitt3r contract", function () {
 
     it("Should set the right lottery jackpot amount", async function() {
       const { twitt3r } = await loadFixture(twitt3rFixture)
-      expect(await twitt3r.getJackpot()).to.equal(hre.ethers.utils.parseEther("1.0"))
+      expect(await twitt3r.getJackpot()).to.equal(hre.ethers.utils.parseEther("0.1"))
     })
 
     it("Should set the right lottery winning odds", async function() {
@@ -203,33 +203,33 @@ describe("Twitt3r contract", function () {
 
     it("Should allow the owner to update the contract settings", async function () {
       const { twitt3r, owner } = await loadFixture(twitt3rFixture)
-      await twitt3r.connect(owner).updateSettings(20, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("1.0"))
+      await twitt3r.connect(owner).updateSettings(20, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("0.1"))
       expect(await twitt3r.getOdds()).to.equal(20)
     })
 
     it("Should not allow users to update the contract settings", async function () {
       const { twitt3r, owner, price, accounts } = await loadFixture(twitt3rFixture)
-      await expect(twitt3r.connect(accounts[1]).updateSettings(20, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("1.0"))).to.be.revertedWith("Ownable: caller is not the owner")
+      await expect(twitt3r.connect(accounts[1]).updateSettings(20, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("0.1"))).to.be.revertedWith("Ownable: caller is not the owner")
     })
   })
 
   describe("Lottery payout", function () {
     it("Should allow anyone to deposit into the contract", async function () {
       const { twitt3r, owner } = await loadFixture(twitt3rFixture)
-      await twitt3r.connect(owner).deposit({ value: hre.ethers.utils.parseEther("1.0") })
-      expect(await twitt3r.getBalance()).to.equal(hre.ethers.utils.parseEther("2.0"))
+      await twitt3r.connect(owner).deposit({ value: hre.ethers.utils.parseEther("0.1") })
+      expect(await twitt3r.getBalance()).to.equal(hre.ethers.utils.parseEther("0.3"))
     })
 
     it("Should pay out a lottery to a winning user", async function () {
       const { twitt3r, owner, price } = await loadFixture(twitt3rFixture)
-      await twitt3r.connect(owner).updateSettings(100, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("1.0"))
+      await twitt3r.connect(owner).updateSettings(100, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("0.1"))
       await expect(twitt3r.newTweet("Test message", 0, 0, price)).to.emit(twitt3r, "WonLottery")
     })
 
     it("Should skip the lottery payout if the contract balance is too low", async function () {
       const { twitt3r, owner, price } = await loadFixture(twitt3rFixture)
       await twitt3r.connect(owner).withdraw()
-      await twitt3r.updateSettings(100, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("1.0"))
+      await twitt3r.updateSettings(100, hre.ethers.utils.parseEther("0.001"), hre.ethers.utils.parseEther("0.1"))
       await expect(twitt3r.newTweet("Test message", 0, 0, price)).to.be.revertedWithCustomError(twitt3r, "InsufficientBalance")
     })
   })

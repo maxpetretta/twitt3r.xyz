@@ -30,8 +30,8 @@ const main = async () => {
   const twitt3r = await contract.deploy(
     0, // Odds
     hre.ethers.utils.parseEther("0.001"), // Price
-    hre.ethers.utils.parseEther("1.0"), // Jackpot
-    { value: hre.ethers.utils.parseEther("1.0") } // Initial contract balance, for paying out awards
+    hre.ethers.utils.parseEther("0.1"), // Jackpot
+    { value: hre.ethers.utils.parseEther("0.2") } // Initial contract balance, for paying out awards
   )
 
   await twitt3r.deployed()
@@ -72,7 +72,7 @@ const main = async () => {
   txn = await twitt3r.updateSettings(
     100, // Odds
     hre.ethers.utils.parseEther("0.001"), // Price
-    hre.ethers.utils.parseEther("1.0"), // Jackpot
+    hre.ethers.utils.parseEther("0.1"), // Jackpot
   )
   await txn.wait()
 

@@ -20,7 +20,7 @@ const main = async () => {
     10, // Odds
     hre.ethers.utils.parseEther("0.001"), // Price
     hre.ethers.utils.parseEther("0.1"), // Jackpot
-    { value: hre.ethers.utils.parseEther("1.0") } // Initial contract balance, for paying out awards
+    { value: hre.ethers.utils.parseEther("0.2") } // Initial contract balance, for paying out awards
   )
 
   await txn.deployed()

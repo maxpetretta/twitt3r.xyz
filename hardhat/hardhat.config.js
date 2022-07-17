@@ -18,5 +18,17 @@ module.exports = {
       url: process.env.RINKEBY_INFURA_URL,
       accounts: [process.env.PRIVATE_KEY],
     },
+    ropsten: {
+      url: process.env.ROPSTEN_INFURA_URL,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    kovan: {
+      url: process.env.KOVAN_INFURA_URL,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    optimism: {
+      url: process.env.OPTIMISM_INFURA_URL,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
 }
