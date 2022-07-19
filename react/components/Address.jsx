@@ -3,7 +3,10 @@ import { useState } from "react"
 import { useEnsName } from "wagmi"
 
 export default function Address(props) {
-  const [ens, setEns] = useState()
+  const match = props.address.match(/^(0x.{4}).+(.{4})$/)
+  const truncated = match[1] + "..." + match[2]
+
+  const [ens, setEns] = useState(truncated)
 
   /**
    * Contract hooks
@@ -13,25 +16,12 @@ export default function Address(props) {
     onSuccess(data) {
       if (data) {
         setEns(data)
-      } else {
-        setEns(truncateAddress(props.address))
       }
     },
     onError(error) {
-      setEns(truncateAddress(props.address))
       console.error("Error fetching ENS", error)
     },
   })
-
-  /**
-   * Returns a truncated wallet address
-   * @param {string} address
-   * @returns {string}
-   */
-  const truncateAddress = (address) => {
-    const match = address.match(/^(0x.{4}).+(.{4})$/)
-    return match[1] + "..." + match[2]
-  }
 
   return (
     <>

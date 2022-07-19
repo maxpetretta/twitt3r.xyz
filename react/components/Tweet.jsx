@@ -335,6 +335,7 @@ export default function Tweet(props) {
       )}
       {replyModal && (
         <ReplyModal
+          id={props.id}
           address={address}
           tweet={tweet}
           modal={replyModal}
