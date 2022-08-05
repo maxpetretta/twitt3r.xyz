@@ -22,6 +22,10 @@ module.exports = {
       url: process.env.ROPSTEN_INFURA_URL,
       accounts: [process.env.PRIVATE_KEY],
     },
+    kovan: {
+      url: process.env.KOVAN_INFURA_URL,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     op_kovan: {
       url: process.env.OP_KOVAN_INFURA_URL,
       accounts: [process.env.PRIVATE_KEY],

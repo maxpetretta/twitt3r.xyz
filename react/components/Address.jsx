@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useEnsName } from "wagmi"
 
 export default function Address(props) {
@@ -11,8 +11,9 @@ export default function Address(props) {
   /**
    * Contract hooks
    */
-  useEnsName({
+  const { refetch: nameRefetch } = useEnsName({
     address: props.address,
+    enabled: false,
     onSuccess(data) {
       if (data) {
         setEns(data)
@@ -22,6 +23,15 @@ export default function Address(props) {
       console.error("Error fetching ENS", error)
     },
   })
+
+  /**
+   * On page load, fetch the ENS profile description (if it exists)
+   */
+  useEffect(() => {
+    if (props.address) {
+      nameRefetch()
+    }
+  }, [props.address, nameRefetch])
 
   return (
     <>

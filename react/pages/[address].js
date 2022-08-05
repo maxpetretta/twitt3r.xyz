@@ -45,10 +45,13 @@ export default function Profile() {
    * On page load, fetch the ENS profile description (if it exists)
    */
   useEffect(() => {
-    setEns(address)
-    nameRefetch()
-    resolverRefetch()
-  }, [address, nameRefetch, resolverRefetch])
+    if (address) {
+      nameRefetch()
+    }
+    if (ens) {
+      resolverRefetch()
+    }
+  }, [address, ens, nameRefetch, resolverRefetch])
 
   return (
     <>
