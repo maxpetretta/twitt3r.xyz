@@ -15,7 +15,7 @@ export default function Layout(props) {
     title: "Twitt3r - What's happening (in web3)",
     description:
       "Twitter, but make it web3.  A decentralized Twitter clone built on the Ethereum blockchain.",
-    image: "https://twitt3r.xyz/images/twitter.png",
+    image: "https://twitt3r.xyz/images/twitt3r.png",
     type: "website",
     ...pageMeta,
   }
@@ -73,7 +73,7 @@ export default function Layout(props) {
         <meta property="og:type" content={meta.type} />
         <meta property="og:site_name" content="Twitt3r" />
         <meta name="twitter:site" content="@maxpetretta" />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content={meta.title} />
         <meta name="twitter:description" content={meta.description} />
         <meta name="twitter:image" content={meta.image} />

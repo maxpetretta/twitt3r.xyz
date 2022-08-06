@@ -15,7 +15,13 @@ import { AppProvider } from "../components/AppProvider"
 import "../styles/globals.css"
 
 const { chains, provider } = configureChains(
-  [chain.hardhat, chain.rinkeby, chain.mainnet], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
+  [
+    chain.hardhat,
+    chain.rinkeby,
+    chain.ropsten,
+    chain.optimismKovan,
+    chain.optimism,
+  ], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
   [
     infuraProvider({ infuraId: process.env.REACT_APP_INFURA_ID }),
     publicProvider(),

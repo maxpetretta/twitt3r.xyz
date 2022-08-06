@@ -1,37 +1,37 @@
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useEnsName } from "wagmi"
 
 export default function Address(props) {
-  const [ens, setEns] = useState()
+  const match = props.address.match(/^(0x.{4}).+(.{4})$/)
+  const truncated = match[1] + "..." + match[2]
+
+  const [ens, setEns] = useState(truncated)
 
   /**
    * Contract hooks
    */
-  useEnsName({
+  const { refetch: nameRefetch } = useEnsName({
     address: props.address,
+    enabled: false,
     onSuccess(data) {
       if (data) {
         setEns(data)
-      } else {
-        setEns(truncateAddress(props.address))
       }
     },
     onError(error) {
-      setEns(truncateAddress(props.address))
       console.error("Error fetching ENS", error)
     },
   })
 
   /**
-   * Returns a truncated wallet address
-   * @param {string} address
-   * @returns {string}
+   * On page load, fetch the ENS profile description (if it exists)
    */
-  const truncateAddress = (address) => {
-    const match = address.match(/^(0x.{4}).+(.{4})$/)
-    return match[1] + "..." + match[2]
-  }
+  useEffect(() => {
+    if (props.address) {
+      nameRefetch()
+    }
+  }, [props.address, nameRefetch])
 
   return (
     <>

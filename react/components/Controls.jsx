@@ -86,6 +86,9 @@ export default function Controls() {
         if (error instanceof UserRejectedRequestError) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
+        } else if (error.message.includes("Ownable: caller is not the owner")) {
+          toast.error("You are not the owner!")
+          console.error("Unauthorized --", error)
         } else {
           toast.error("Transaction failed")
           console.error("Transaction failed --", error)
@@ -112,6 +115,9 @@ export default function Controls() {
         if (error instanceof UserRejectedRequestError) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
+        } else if (error.message.includes("Ownable: caller is not the owner")) {
+          toast.error("You are not the owner!")
+          console.error("Unauthorized --", error)
         } else {
           toast.error("Transaction failed")
           console.error("Transaction failed --", error)
@@ -135,6 +141,9 @@ export default function Controls() {
         if (error instanceof UserRejectedRequestError) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
+        } else if (error.message.includes("Ownable: caller is not the owner")) {
+          toast.error("You are not the owner!")
+          console.error("Unauthorized --", error)
         } else {
           toast.error("Transaction failed")
           console.error("Transaction failed --", error)
@@ -158,6 +167,9 @@ export default function Controls() {
         if (error instanceof UserRejectedRequestError) {
           toast.error("User rejected transaction")
           console.error("User rejected transaction")
+        } else if (error.message.includes("Ownable: caller is not the owner")) {
+          toast.error("You are not the owner!")
+          console.error("Unauthorized --", error)
         } else {
           toast.error("Transaction failed")
           console.error("Transaction failed --", error)
@@ -167,7 +179,7 @@ export default function Controls() {
   )
 
   /**
-   * Update the setting parameters (price, odds, jackpot) , only for the owner
+   * Update the setting parameters (price, odds, jackpot), only for the owner
    * @param {Object} event
    */
   const updateContractSettings = async (event) => {
@@ -176,8 +188,8 @@ export default function Controls() {
 
       updateSettings({
         args: [
-          ethers.utils.parseEther(event.target.price.value),
           event.target.odds.value,
+          ethers.utils.parseEther(event.target.price.value),
           ethers.utils.parseEther(event.target.jackpot.value),
         ],
       })
@@ -223,6 +235,19 @@ export default function Controls() {
       </p>
       <form onSubmit={updateContractSettings}>
         <div className="mt-3 flex">
+          <label>Odds:</label>
+          <input
+            id="odds"
+            type="number"
+            value={odds}
+            onChange={(e) => setOdds(e.target.value)}
+            placeholder="0 - 100"
+            className="w-full bg-gray-100 text-right"
+            required
+          />
+          <span>%</span>
+        </div>
+        <div className="mt-1 flex">
           <label>Price:</label>
           <input
             id="price"
@@ -235,19 +260,6 @@ export default function Controls() {
             required
           />
           <span>Ξ</span>
-        </div>
-        <div className="mt-1 flex">
-          <label>Odds:</label>
-          <input
-            id="odds"
-            type="number"
-            value={odds}
-            onChange={(e) => setOdds(e.target.value)}
-            placeholder="0 - 100"
-            className="w-full bg-gray-100 text-right"
-            required
-          />
-          <span>%</span>
         </div>
         <div className="mt-1 flex">
           <label>Jackpot:</label>

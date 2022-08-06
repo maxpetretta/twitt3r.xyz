@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useEnsAvatar } from "wagmi"
 
 export default function Avatar(props) {
@@ -13,15 +13,16 @@ export default function Avatar(props) {
     "bg-sky-400",
     "bg-indigo-400",
     "bg-purple-400",
-    "bg-fushsia-400",
+    "bg-fuchsia-400",
     "bg-rose-400",
   ]
 
   /**
    * Contract hooks
    */
-  useEnsAvatar({
+  const { refetch: avatarRefetch } = useEnsAvatar({
     addressOrName: props.address,
+    enabled: false,
     onSuccess(data) {
       if (data) {
         setAvatar(data)
@@ -42,6 +43,15 @@ export default function Avatar(props) {
     const index = Math.floor(rng() * 10)
     return colors[index]
   }
+
+  /**
+   * On page load, fetch the ENS profile avatar (if it exists)
+   */
+  useEffect(() => {
+    if (props.address) {
+      avatarRefetch()
+    }
+  }, [props.address, avatarRefetch])
 
   return (
     <>
