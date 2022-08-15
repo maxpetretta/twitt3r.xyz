@@ -22,7 +22,6 @@ const { chains, provider } = configureChains(
     chain.kovan,
     chain.goerli,
     chain.optimismKovan,
-    chain.optimism,
   ], // Hardhat must come first due to provider issue, see: https://github.com/tmm/wagmi/discussions/425
   [
     infuraProvider({ infuraId: process.env.REACT_APP_INFURA_ID }),
