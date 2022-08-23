@@ -3,9 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    /* @apply bg-gray-900; */
-  }
   a {
     @apply text-twitter-blue hover:underline;
   }
