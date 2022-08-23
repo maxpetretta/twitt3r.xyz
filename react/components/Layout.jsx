@@ -1,7 +1,7 @@
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useState } from "react"
-import toast, { Toaster } from "react-hot-toast"
+import { toast, Toaster } from "react-hot-toast"
 import { useAccount, useContractRead } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
 import Nav from "./Nav"
@@ -30,16 +30,19 @@ export default function Layout(props) {
         console.debug("Found authorized account: ", data.address)
 
         // Alert user to which networks are available
-        toast("Twitt3r only supports Goerli & Ropsten testnets!", {
-          duration: 8000,
-          position: "top-center",
-          style: {
-            color: "#FFFFFF",
-            backgroundColor: "#DC2626",
-            minWidth: "440px",
-          },
-          icon: "⚠️",
-        })
+        if (!sessionStorage.getItem("seenNetworkAlert")) {
+          toast("Twitt3r only supports Goerli & Ropsten testnets!", {
+            duration: 8000,
+            position: "top-center",
+            style: {
+              color: "#FFFFFF",
+              backgroundColor: "#DC2626",
+              minWidth: "440px",
+            },
+            icon: "⚠️",
+          })
+          sessionStorage.setItem("seenNetworkAlert", true)
+        }
 
         // Check if this is the owner's wallet
         if (

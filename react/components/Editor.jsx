@@ -18,7 +18,7 @@ export default function Editor() {
   const [price, setPrice] = useState(0)
   useAccount({
     onSuccess(data) {
-      if (data) {
+      if (data && !address) {
         setAddress(data.address)
       }
     },

@@ -8,7 +8,7 @@ export default function Error404() {
   const [address, setAddress] = useState()
   useAccount({
     onSuccess(data) {
-      if (data) {
+      if (data && !address) {
         setAddress(data.address)
       }
     },
