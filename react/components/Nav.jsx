@@ -8,7 +8,7 @@ export default function Nav() {
   const [address, setAddress] = useState("")
   useAccount({
     onSuccess(data) {
-      if (data) {
+      if (data && !address) {
         setAddress(data.address)
       }
     },

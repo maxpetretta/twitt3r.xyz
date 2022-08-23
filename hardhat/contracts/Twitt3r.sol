@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 /**
  * @title Twitt3r
  * @author Max Petretta (maxpetretta.eth)
- * @notice A decentralized version of Twitter, build on the Ethereum blockchain
+ * @notice A decentralized version of Twitter, built on the Ethereum blockchain
  * @dev Not audited!
  */
 contract Twitt3r is Ownable, Pausable {

@@ -13,7 +13,7 @@ export const AppProvider = ({ children }) => {
   const [confetti, setConfetti] = useState(false)
   useAccount({
     onSuccess(data) {
-      if (data) {
+      if (data && !address) {
         setAddress(data.address)
       }
     },

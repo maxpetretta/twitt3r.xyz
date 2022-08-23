@@ -1,8 +1,10 @@
 # twitt3r.xyz
 This repo contains the source code for [Twitt3r](https://twitt3r.xyz), a decentralized Twitter clone built on the [Ethereum blockchain](https://ethereum.org/en/).  The project utilizes a custom smart contract for message storage, and [ENS lookups](https://ens.domains/) for profile information.  It is deployed to the [Goerli](https://goerli.etherscan.io/address/0x3493B7ABE5e6E142D632e6596bc550A73c87Ee79) and [Ropsten](https://ropsten.etherscan.io/address/0x3493B7ABE5e6E142D632e6596bc550A73c87Ee79) testnets.
 
+**Want to learn more?  Read all the details in [this blog post!](https://maxpetretta.com/blog/twitt3r)**
+
 ## Demo
-<img src="./demo.gif" alt="A quick 60 second demo of twitt3r.xyz" title="Twitt3r demo gif">
+[![A quick 60 second demo of twitt3r.xyz](./demo.gif)](https://twitt3r.xyz)
 
 ## Tech Stack
 Built with the following technologies:
