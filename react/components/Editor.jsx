@@ -94,7 +94,7 @@ export default function Editor() {
 
   return (
     <section className="flex flex-col border-b">
-      <div className="mb-4 flex items-center justify-between md:mb-0">
+      <div className="mb-2 flex items-center justify-between md:mb-0">
         <div className="flex items-center">
           <Link href="/">
             <a className="mt-4 ml-3 block md:hidden">
@@ -119,6 +119,9 @@ export default function Editor() {
         <div className="mt-4 mr-3 block lg:hidden">
           <ConnectButton chainStatus="none" />
         </div>
+      </div>
+      <div className="mx-4 mb-3 rounded-xl bg-twitter-pink p-2 text-center font-semibold text-white lg:hidden">
+        Twitt3r is best experienced on desktop!
       </div>
       <div className="mt-2 hidden items-center md:flex">
         <Avatar address={address} />

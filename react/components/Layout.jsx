@@ -37,7 +37,8 @@ export default function Layout(props) {
             style: {
               color: "#FFFFFF",
               backgroundColor: "#DC2626",
-              minWidth: "440px",
+              minWidth: "460px",
+              fontWeight: 600,
             },
             icon: "⚠️",
           })

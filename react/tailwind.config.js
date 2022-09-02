@@ -16,6 +16,7 @@ module.exports = {
         twitter: {
           blue: "#4E98EC",
           gray: "#17202A",
+          pink: "#E73F82",
         },
       },
       fontFamily: {

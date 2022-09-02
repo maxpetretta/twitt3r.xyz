@@ -200,7 +200,7 @@ export default function Tweet(props) {
       )}
       {tweet && (
         <div className="flex">
-          <div className="flex min-h-fit flex-col">
+          <div className="flex min-h-fit min-w-fit flex-col">
             <div
               className={
                 retweet || tweet.replyID.isZero()
