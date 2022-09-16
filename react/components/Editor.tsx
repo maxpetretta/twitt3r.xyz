@@ -10,7 +10,7 @@ import {
   UserRejectedRequestError,
 } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
-import Avatar from "./Avatar.jsx"
+import Avatar from "./Avatar"
 
 export default function Editor() {
   const [address, setAddress] = useState()
