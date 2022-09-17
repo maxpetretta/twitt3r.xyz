@@ -10,7 +10,7 @@ import { contractABI, contractAddress } from "../lib/contract.js"
 import Avatar from "./Avatar"
 
 export default function TweetModal(props) {
-  const [price, setPrice] = useState(0)
+  const [price, setPrice] = useState("")
   const [message, setMessage] = useState("")
 
   /**
@@ -118,15 +118,15 @@ export default function TweetModal(props) {
           <div className="mt-16 mb-4 flex items-center md:mt-4">
             <Avatar address={props.address} />
             <textarea
-              type="text"
-              rows="1"
+              rows={1}
               value={message}
-              maxLength="280"
+              maxLength={280}
               placeholder="What's happening? (in web3)"
               onChange={(e) => setMessage(e.target.value)}
               onInput={(e) => {
-                e.target.style.height = "auto"
-                e.target.style.height = e.target.scrollHeight + "px"
+                ;(e.target as HTMLInputElement).style.height = "auto"
+                ;(e.target as HTMLInputElement).style.height =
+                  (e.target as HTMLInputElement).scrollHeight + "px"
               }}
               className="mr-4 mb-4 grow resize-none text-xl outline-none"
             />

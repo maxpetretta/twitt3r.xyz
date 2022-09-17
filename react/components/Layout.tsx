@@ -42,7 +42,7 @@ export default function Layout(props) {
             },
             icon: "⚠️",
           })
-          sessionStorage.setItem("seenNetworkAlert", true)
+          sessionStorage.setItem("seenNetworkAlert", "true")
         }
 
         // Check if this is the owner's wallet

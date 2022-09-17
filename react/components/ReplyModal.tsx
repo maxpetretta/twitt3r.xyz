@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import { ethers } from "ethers"
 import { useState } from "react"
 import toast from "react-hot-toast"
@@ -11,8 +10,13 @@ import { contractABI, contractAddress } from "../lib/contract.js"
 import Address from "./Address"
 import Avatar from "./Avatar"
 
+// Need type definitions, see: https://github.com/iamkun/dayjs/issues/297
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+dayjs.extend(relativeTime)
+
 export default function ReplyTweet(props) {
-  const [price, setPrice] = useState(0)
+  const [price, setPrice] = useState("")
   const [message, setMessage] = useState("")
 
   /**
@@ -72,7 +76,7 @@ export default function ReplyTweet(props) {
    * Reply to the specified tweet
    * @param {number} id
    */
-  const sendReply = async (id) => {
+  const sendReply = async (id: number) => {
     try {
       newTweet({
         args: [message.toString(), id, 0],
@@ -141,15 +145,15 @@ export default function ReplyTweet(props) {
           <div className="mt-8 mb-4 flex flex-1 items-center">
             <Avatar address={props.address} />
             <textarea
-              type="text"
-              rows="1"
+              rows={1}
               value={message}
-              maxLength="280"
+              maxLength={280}
               placeholder="Tw33t your reply"
               onChange={(e) => setMessage(e.target.value)}
               onInput={(e) => {
-                e.target.style.height = "auto"
-                e.target.style.height = e.target.scrollHeight + "px"
+                ;(e.target as HTMLInputElement).style.height = "auto"
+                ;(e.target as HTMLInputElement).style.height =
+                  (e.target as HTMLInputElement).scrollHeight + "px"
               }}
               className="mr-4 mb-4 grow resize-none text-xl outline-none"
             />

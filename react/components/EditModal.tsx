@@ -52,7 +52,7 @@ export default function ReplyTweet(props) {
    * Update the specified tweet from the contract
    * @param {number} id
    */
-  const sendEdit = async (id) => {
+  const sendEdit = async (id: number) => {
     try {
       editTweet({
         args: [id, props.message],
@@ -100,15 +100,15 @@ export default function ReplyTweet(props) {
           <div className="mt-16 mb-4 flex items-center md:mt-4">
             <Avatar address={props.address} />
             <textarea
-              type="text"
-              rows="1"
+              rows={1}
               value={props.message}
-              maxLength="280"
+              maxLength={280}
               placeholder="Edit your tw33t's message"
               onChange={(e) => props.setMessage(e.target.value)}
               onInput={(e) => {
-                e.target.style.height = "auto"
-                e.target.style.height = e.target.scrollHeight + "px"
+                ;(e.target as HTMLInputElement).style.height = "auto"
+                ;(e.target as HTMLInputElement).style.height =
+                  (e.target as HTMLInputElement).scrollHeight + "px"
               }}
               className="mr-4 mb-4 grow resize-none text-xl outline-none"
             />

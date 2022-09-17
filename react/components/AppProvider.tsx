@@ -5,11 +5,11 @@ import toast from "react-hot-toast"
 import { useAccount, useContractEvent, useContractRead } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
 
-const AppContext = createContext()
+const AppContext = createContext(null)
 
 export const AppProvider = ({ children }) => {
-  const [address, setAddress] = useState()
-  const [tweets, setTweets] = useState(new Map())
+  const [address, setAddress] = useState("")
+  const [tweets, setTweets] = useState(null)
   const [confetti, setConfetti] = useState(false)
   useAccount({
     onSuccess(data) {
@@ -35,6 +35,7 @@ export const AppProvider = ({ children }) => {
             let newState = new Map(prevState)
             data.forEach((tweet, id) => {
               newState.set(id + 1, {
+                id: id + 1,
                 from: tweet[0],
                 timestamp: new Date(tweet[1] * 1000),
                 message: tweet[2],
@@ -71,6 +72,7 @@ export const AppProvider = ({ children }) => {
       setTweets((prevState) => {
         let newState = new Map(prevState)
         newState.set(id.toNumber(), {
+          id: id.toNumber(),
           from: from,
           timestamp: new Date(timestamp * 1000),
           message: message,
@@ -107,6 +109,7 @@ export const AppProvider = ({ children }) => {
       setTweets((prevState) => {
         let newState = new Map(prevState)
         newState.set(id.toNumber(), {
+          id: id.toNumber(),
           from: from,
           timestamp: new Date(timestamp * 1000),
           message: message,

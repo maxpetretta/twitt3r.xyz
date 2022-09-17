@@ -16,7 +16,7 @@ export default function Profile() {
    * Contract hooks
    */
   const { data: name, refetch: nameRefetch } = useEnsName({
-    address: address,
+    address: address[0],
     enabled: false,
     onSuccess(data) {
       setEns(data ? data : address)

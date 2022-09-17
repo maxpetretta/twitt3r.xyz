@@ -1,5 +1,5 @@
 import { ethers } from "ethers"
-import { useState } from "react"
+import React, { useState } from "react"
 import toast from "react-hot-toast"
 import {
   useContractRead,
@@ -9,9 +9,9 @@ import {
 import { contractABI, contractAddress } from "../lib/contract"
 
 export default function Controls() {
-  const [price, setPrice] = useState(0)
-  const [odds, setOdds] = useState(0)
-  const [jackpot, setJackpot] = useState(0)
+  const [price, setPrice] = useState("")
+  const [odds, setOdds] = useState("")
+  const [jackpot, setJackpot] = useState("")
 
   /**
    * Contract hooks
@@ -182,15 +182,17 @@ export default function Controls() {
    * Update the setting parameters (price, odds, jackpot), only for the owner
    * @param {Object} event
    */
-  const updateContractSettings = async (event) => {
+  const updateContractSettings = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     try {
-      event.preventDefault()
+      e.preventDefault()
 
       updateSettings({
         args: [
-          event.target.odds.value,
-          ethers.utils.parseEther(event.target.price.value),
-          ethers.utils.parseEther(event.target.jackpot.value),
+          e.currentTarget.odds.value,
+          ethers.utils.parseEther(e.currentTarget.price.value),
+          ethers.utils.parseEther(e.currentTarget.jackpot.value),
         ],
       })
     } catch (error) {
