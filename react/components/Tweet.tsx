@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import { ethers } from "ethers"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
@@ -9,20 +8,23 @@ import {
   UserRejectedRequestError,
 } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
+import { Tweet as TweetType } from "../lib/types"
 import Address from "./Address"
 import { useTweets } from "./AppProvider"
 import Avatar from "./Avatar"
 import EditModal from "./EditModal"
 import ReplyModal from "./ReplyModal"
 
-export default function Tweet(props) {
-  var relativeTime = require("dayjs/plugin/relativeTime")
-  dayjs.extend(relativeTime)
+// Need type definitions, see: https://github.com/iamkun/dayjs/issues/297
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+dayjs.extend(relativeTime)
 
-  const [address, setAddress] = useState()
-  const [price, setPrice] = useState(0)
-  const [tweet, setTweet] = useState()
-  const [retweet, setRetweet] = useState()
+export default function Tweet(props) {
+  const [address, setAddress] = useState("")
+  const [price, setPrice] = useState("")
+  const [tweet, setTweet]: [any, any] = useState()
+  const [retweet, setRetweet]: [any, any] = useState()
   const [message, setMessage] = useState("")
   const [replyModal, setReplyModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
@@ -119,7 +121,7 @@ export default function Tweet(props) {
    * Retweet the specified tweet
    * @param {number} id
    */
-  const sendRetweet = async (id) => {
+  const sendRetweet = async (id: number) => {
     try {
       newTweet({
         args: ["", 0, id],
@@ -135,7 +137,7 @@ export default function Tweet(props) {
    * Delete the specified tweet from the contract
    * @param {number} id
    */
-  const removeTweet = async (id) => {
+  const removeTweet = async (id: number) => {
     try {
       deleteTweet({
         args: [id],
@@ -151,7 +153,7 @@ export default function Tweet(props) {
    * @param {number} id
    * @returns {Array}
    */
-  const getReplies = (id) => {
+  const getReplies = (id: number): TweetType[] => {
     let replies = [...tweets.entries()].filter(
       (tweet) => tweet[1].replyID.eq(id) && !tweet[1].deleted
     )
@@ -162,9 +164,9 @@ export default function Tweet(props) {
    * On page load, get the relevant tweet or retweet
    */
   useEffect(() => {
-    if (tweets.get(props.id).retweetID.isZero()) {
+    if (props.id && tweets.get(props.id).retweetID.isZero()) {
       setTweet(tweets.get(props.id))
-    } else {
+    } else if (props.id) {
       const retweetID = tweets.get(props.id).retweetID
       setTweet(tweets.get(retweetID.toNumber()))
       setRetweet(tweets.get(props.id))

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useEnsAvatar } from "wagmi"
 
 export default function Avatar(props) {
-  const [avatar, setAvatar] = useState()
+  const [avatar, setAvatar] = useState("")
   const seedrandom = require("seedrandom")
   const colors = [
     "bg-red-400",
@@ -55,6 +55,9 @@ export default function Avatar(props) {
 
   return (
     <>
+      {
+        // eslint-disable-next-line
+      }
       <img
         src={avatar}
         className={
