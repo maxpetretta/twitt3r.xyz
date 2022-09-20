@@ -1,10 +1,11 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useEnsName } from "wagmi"
+import { AddressProps } from "../lib/types"
 
-export default function Address(props) {
+export default function Address(props: AddressProps) {
   const match = props.address.match(/^(0x.{4}).+(.{4})$/)
-  const truncated = match[1] + "..." + match[2]
+  const truncated = match![1] + "..." + match![2]
 
   const [ens, setEns] = useState(truncated)
 

@@ -6,7 +6,8 @@ import {
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { contractABI, contractAddress } from "../lib/contract.js"
+import { contractABI, contractAddress } from "../lib/contract"
+import { ReplyProps } from "../lib/types.js"
 import Address from "./Address"
 import Avatar from "./Avatar"
 
@@ -15,7 +16,7 @@ import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjs.extend(relativeTime)
 
-export default function ReplyTweet(props) {
+export default function ReplyTweet(props: ReplyProps) {
   const [price, setPrice] = useState("")
   const [message, setMessage] = useState("")
 
@@ -54,7 +55,10 @@ export default function ReplyTweet(props) {
         totalTweetsRefetch().then((value) => {
           toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {

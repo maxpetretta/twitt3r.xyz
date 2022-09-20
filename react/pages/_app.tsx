@@ -6,6 +6,7 @@ import {
   wallet,
 } from "@rainbow-me/rainbowkit"
 import "@rainbow-me/rainbowkit/styles.css"
+import { AppProps } from "next/app"
 import Head from "next/head"
 import Script from "next/script"
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi"
@@ -53,7 +54,7 @@ const wagmiClient = createClient({
   provider,
 })
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>

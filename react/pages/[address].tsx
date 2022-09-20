@@ -27,14 +27,15 @@ export default function Profile() {
   })
 
   const { refetch: resolverRefetch } = useEnsResolver({
-    name: name,
+    name: String(name),
     enabled: false,
     onSuccess(data) {
-      data.getText("description").then((value) => {
-        if (value) {
-          setDescription(value)
-        }
-      })
+      data &&
+        data.getText("description").then((value) => {
+          if (value) {
+            setDescription(value)
+          }
+        })
     },
     onError(error) {
       console.error("Error fetching ENS", error)
@@ -80,7 +81,7 @@ export default function Profile() {
           <div className="mt-4 h-48 w-full bg-twitter-blue" />
           <div className="relative -top-16">
             <Avatar
-              address={address}
+              address={address?.toString()}
               styles="top-0 left-0 z-10 ml-4 block h-32 w-32 rounded-full border-4 border-white"
             />
             <a href={`https://etherscan.io/address/${address}`}>
@@ -96,7 +97,7 @@ export default function Profile() {
             <p className="mt-4">{description}</p>
           </div>
         </section>
-        <TweetList author={address} />
+        <TweetList author={address?.toString()} />
       </Layout>
     </>
   )

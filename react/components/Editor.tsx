@@ -9,7 +9,7 @@ import {
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { contractABI, contractAddress } from "../lib/contract.js"
+import { contractABI, contractAddress } from "../lib/contract"
 import Avatar from "./Avatar"
 
 export default function Editor() {
@@ -18,7 +18,7 @@ export default function Editor() {
   const [price, setPrice] = useState("")
   useAccount({
     onSuccess(data) {
-      if (data && !address) {
+      if (data.address && !address) {
         setAddress(data.address)
       }
     },
@@ -59,7 +59,10 @@ export default function Editor() {
         totalTweetsRefetch().then((value) => {
           toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {
