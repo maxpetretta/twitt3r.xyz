@@ -108,7 +108,10 @@ export default function Controls() {
         toast.success("Cleared tweets")
         console.debug("Cleared --", data.hash)
         totalTweetsRefetch().then((value) => {
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {

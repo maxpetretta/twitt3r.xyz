@@ -4,11 +4,12 @@ import { useState } from "react"
 import { toast, Toaster } from "react-hot-toast"
 import { useAccount, useContractRead } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
+import { LayoutProps } from "../lib/types.js"
 import Nav from "./Nav"
 import Sidebar from "./Sidebar"
 import TweetModal from "./TweetModal"
 
-export default function Layout(props) {
+export default function Layout(props: LayoutProps) {
   const { children, ...pageMeta } = props
   const router = useRouter()
   const meta = {
@@ -25,7 +26,7 @@ export default function Layout(props) {
   const [isOwner, setIsOwner] = useState(false)
   useAccount({
     onSuccess(data) {
-      if (data && !address) {
+      if (data.address && !address) {
         setAddress(data.address)
         console.debug("Found authorized account: ", data.address)
 
@@ -48,7 +49,7 @@ export default function Layout(props) {
         // Check if this is the owner's wallet
         if (
           ownerData &&
-          ownerData.toUpperCase() === data.address.toUpperCase()
+          ownerData.toUpperCase() === data.address!.toUpperCase()
         ) {
           setIsOwner(true)
         } else {

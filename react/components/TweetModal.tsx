@@ -7,9 +7,10 @@ import {
   UserRejectedRequestError,
 } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
+import { ModalProps } from "../lib/types.js"
 import Avatar from "./Avatar"
 
-export default function TweetModal(props) {
+export default function TweetModal(props: ModalProps) {
   const [price, setPrice] = useState("")
   const [message, setMessage] = useState("")
 
@@ -48,7 +49,10 @@ export default function TweetModal(props) {
         totalTweetsRefetch().then((value) => {
           toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {

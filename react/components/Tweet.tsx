@@ -8,7 +8,7 @@ import {
   UserRejectedRequestError,
 } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
-import { Tweet as TweetType } from "../lib/types"
+import { Tweet as TweetType, TweetProps } from "../lib/types"
 import Address from "./Address"
 import { useTweets } from "./AppProvider"
 import Avatar from "./Avatar"
@@ -20,7 +20,7 @@ import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjs.extend(relativeTime)
 
-export default function Tweet(props) {
+export default function Tweet(props: TweetProps) {
   const [address, setAddress] = useState("")
   const [price, setPrice] = useState("")
   const [tweet, setTweet]: [any, any] = useState()
@@ -32,7 +32,7 @@ export default function Tweet(props) {
   const { tweets } = useTweets()
   useAccount({
     onSuccess(data) {
-      if (data && !address) {
+      if (data.address && !address) {
         setAddress(data.address)
       }
     },
@@ -73,7 +73,10 @@ export default function Tweet(props) {
         totalTweetsRefetch().then((value) => {
           toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {
@@ -99,7 +102,10 @@ export default function Tweet(props) {
         totalTweetsRefetch().then((value) => {
           toast.success("Deleted tweet!")
           console.debug("Deleted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {
@@ -153,21 +159,24 @@ export default function Tweet(props) {
    * @param {number} id
    * @returns {Array}
    */
-  const getReplies = (id: number): TweetType[] => {
-    let replies = [...tweets.entries()].filter(
-      (tweet) => tweet[1].replyID.eq(id) && !tweet[1].deleted
-    )
-    return replies
+  const getReplies = (id: number): [number, TweetType][] => {
+    if (tweets) {
+      let replies = [...tweets.entries()].filter(
+        (tweet) => tweet[1].replyID.eq(id) && !tweet[1].deleted
+      )
+      return replies
+    }
+    return []
   }
 
   /*
    * On page load, get the relevant tweet or retweet
    */
   useEffect(() => {
-    if (props.id && tweets.get(props.id).retweetID.isZero()) {
+    if (tweets && props.id && tweets.get(props.id)!.retweetID.isZero()) {
       setTweet(tweets.get(props.id))
-    } else if (props.id) {
-      const retweetID = tweets.get(props.id).retweetID
+    } else if (tweets && props.id) {
+      const retweetID = tweets.get(props.id)!.retweetID
       setTweet(tweets.get(retweetID.toNumber()))
       setRetweet(tweets.get(props.id))
     }

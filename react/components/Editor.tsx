@@ -18,7 +18,7 @@ export default function Editor() {
   const [price, setPrice] = useState("")
   useAccount({
     onSuccess(data) {
-      if (data && !address) {
+      if (data.address && !address) {
         setAddress(data.address)
       }
     },
@@ -59,7 +59,10 @@ export default function Editor() {
         totalTweetsRefetch().then((value) => {
           toast.success("Sent tweet!")
           console.debug("Tweeted --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {

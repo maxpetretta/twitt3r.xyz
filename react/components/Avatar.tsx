@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { useEnsAvatar } from "wagmi"
+import { AvatarProps } from "../lib/types"
 
-export default function Avatar(props) {
+export default function Avatar(props: AvatarProps) {
   const [avatar, setAvatar] = useState("")
   const seedrandom = require("seedrandom")
   const colors = [
@@ -73,9 +74,9 @@ export default function Avatar(props) {
           avatar
             ? "hidden"
             : props.styles
-            ? `${props.styles} ${getColorFromAddress(props.address)}`
+            ? `${props.styles} ${getColorFromAddress(Number(props.address))}`
             : `mx-3 inline h-12 w-12 self-start rounded-full ${getColorFromAddress(
-                props.address
+                Number(props.address)
               )}`
         }
       >

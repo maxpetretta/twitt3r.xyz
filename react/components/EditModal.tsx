@@ -5,9 +5,10 @@ import {
   UserRejectedRequestError,
 } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
+import { EditProps } from "../lib/types.js"
 import Avatar from "./Avatar"
 
-export default function ReplyTweet(props) {
+export default function EditTweet(props: EditProps) {
   /**
    * Contract hooks
    */
@@ -30,7 +31,10 @@ export default function ReplyTweet(props) {
         totalTweetsRefetch().then((value) => {
           toast.success("Edited tweet!")
           console.debug("Edited --", data.hash)
-          console.debug("Retrieved total tweet count --", value.data.toNumber())
+          console.debug(
+            "Retrieved total tweet count --",
+            value.data!.toNumber()
+          )
         })
       },
       onError(error) {

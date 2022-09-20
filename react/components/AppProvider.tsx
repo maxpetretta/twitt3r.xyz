@@ -1,19 +1,25 @@
 import { ethers } from "ethers"
-import { createContext, useContext, useState } from "react"
+import React, { createContext, useContext, useState } from "react"
 import Confetti from "react-confetti"
 import toast from "react-hot-toast"
 import { useAccount, useContractEvent, useContractRead } from "wagmi"
 import { contractABI, contractAddress } from "../lib/contract.js"
+import { Tweet as TweetType } from "../lib/types"
 
-const AppContext = createContext(null)
+const AppContext = createContext<{
+  tweets: Map<number, TweetType> | undefined
+  setTweets: React.Dispatch<
+    React.SetStateAction<Map<number, TweetType> | undefined>
+  >
+}>(undefined!)
 
-export const AppProvider = ({ children }) => {
+export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [address, setAddress] = useState("")
-  const [tweets, setTweets] = useState(null)
+  const [tweets, setTweets] = useState<Map<number, TweetType> | undefined>()
   const [confetti, setConfetti] = useState(false)
   useAccount({
     onSuccess(data) {
-      if (data && !address) {
+      if (data.address && !address) {
         setAddress(data.address)
       }
     },
@@ -31,7 +37,7 @@ export const AppProvider = ({ children }) => {
     {
       onSuccess(data) {
         if (data) {
-          setTweets((prevState) => {
+          setTweets((prevState: Map<number, TweetType> | undefined) => {
             let newState = new Map(prevState)
             data.forEach((tweet, id) => {
               newState.set(id + 1, {
