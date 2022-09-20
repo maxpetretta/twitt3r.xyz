@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react"
 import Confetti from "react-confetti"
 import toast from "react-hot-toast"
 import { useAccount, useContractEvent, useContractRead } from "wagmi"
-import { contractABI, contractAddress } from "../lib/contract.js"
+import { contractABI, contractAddress } from "../lib/contract"
 import { Tweet as TweetType } from "../lib/types"
 
 const AppContext = createContext<{

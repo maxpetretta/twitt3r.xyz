@@ -4,7 +4,7 @@ import {
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { contractABI, contractAddress } from "../lib/contract.js"
+import { contractABI, contractAddress } from "../lib/contract"
 import { EditProps } from "../lib/types.js"
 import Avatar from "./Avatar"
 

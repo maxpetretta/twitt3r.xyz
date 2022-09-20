@@ -7,7 +7,7 @@ import {
   useContractWrite,
   UserRejectedRequestError,
 } from "wagmi"
-import { contractABI, contractAddress } from "../lib/contract.js"
+import { contractABI, contractAddress } from "../lib/contract"
 import { Tweet as TweetType, TweetProps } from "../lib/types"
 import Address from "./Address"
 import { useTweets } from "./AppProvider"
